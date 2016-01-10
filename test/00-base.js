@@ -30,11 +30,18 @@ function createObject(type, options) {
 }
 
 describe('Initializing a new object', () => {
-  it('just extending', () => {
-    const basicObject = createObject('normal', { name: 'test' });
-    expect(basicObject)
-      .to.have.property('name')
-      .to.equal('test');
+  describe('just extending', () => {
+    it('without values', () => {
+      const basicObject = createObject('normal');
+      expect(basicObject)
+        .to.eql({});
+    });
+    it('with values', () => {
+      const basicObject = createObject('normal', { name: 'test' });
+      expect(basicObject)
+        .to.have.property('name')
+        .to.equal('test');
+    });
   });
   describe('Overriding initializer hooks', () => {
     it('#beforeInitialize', () => {

@@ -1,14 +1,17 @@
 class Jsmoo {
   static has(attrs) {
     Object.keys(attrs).forEach(attr => {
+      const attrOptions = attrs[attr];
+      if (!attrOptions || !attrOptions.is) throw new TypeError("'is' key is required");
       Object.defineProperty(this.prototype, attr, {
-        value:      attrs[attr].default,
-        writable:   attrs[attr].is === 'ro' ? false : true,
+        value:      attrOptions.default,
+        writable:   attrOptions.is === 'ro' ? false : true,
         enumerable: true,
       });
     });
   }
   constructor(attrs) {
+    if (attrs === null || attrs === undefined) return;
     let newAttrs;
     if (typeof this.beforeInitialize === 'function') newAttrs = this.beforeInitialize(attrs);
     if (newAttrs) {
