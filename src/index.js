@@ -2,9 +2,11 @@ class Jsmoo {
   static has(attrs) {
     Object.keys(attrs).forEach(attr => {
       const attrOptions = attrs[attr];
+      const defaultValue = typeof attrOptions.default === 'function' ?
+        attrOptions.default() : attrOptions.default;
       if (!attrOptions || !attrOptions.is) throw new TypeError("'is' key is required");
       Object.defineProperty(this.prototype, attr, {
-        value:      attrOptions.default,
+        value:      defaultValue,
         writable:   attrOptions.is === 'ro' ? false : true,
         enumerable: true,
       });
