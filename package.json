@@ -1,0 +1,40 @@
+{
+  "name": "jsmoo",
+  "version": "0.0.0",
+  "description": "JavaScript Minimalist Object Orientation",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "babel src -d lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/XescuGC/jsmoo.git"
+  },
+  "files": [
+    "lib/",
+    "package.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "oo",
+    "object",
+    "orientation",
+    "moo"
+  ],
+  "author": "xescugc <xescugil@gmail.com>",
+  "license": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/XescuGC/jsmoo/blob/master/LICENSE"
+    }
+  ],
+  "bugs": {
+    "url": "https://github.com/XescuGC/jsmoo/issues"
+  },
+  "homepage": "https://github.com/XescuGC/jsmoo#readme",
+  "devDependencies": {
+    "babel-cli": "^6.4.0"
+  }
+}
