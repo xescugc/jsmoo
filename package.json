@@ -4,8 +4,10 @@
   "description": "JavaScript Minimalist Object Orientation",
   "main": "lib/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "babel src -d lib"
+    "watch": "./node_modules/watch/cli.js 'npm run lint && npm run build && npm run test' src/ test/ -d",
+    "test": "./node_modules/mocha/bin/mocha --growl",
+    "lint": "./node_modules/eslint/bin/eslint.js src/ test/",
+    "build": "./node_modules/babel-cli/bin/babel.js src -d lib"
   },
   "repository": {
     "type": "git",
@@ -35,6 +37,8 @@
   },
   "homepage": "https://github.com/XescuGC/jsmoo#readme",
   "devDependencies": {
-    "babel-cli": "^6.4.0"
+    "babel-cli": "^6.4.0",
+    "eslint": "^1.10.3",
+    "eslint-config-airbnb": "^3.1.0"
   }
 }
