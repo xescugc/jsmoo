@@ -8,7 +8,11 @@ function createObject(type, options) {
   switch (type) {
     case 'normal':
       break;
+    case 'has':
+      BasicObject.has({ name: { is: 'rw' } });
+      break;
     case 'before':
+      BasicObject.has({ name: { is: 'rw' } });
       BasicObject.prototype.beforeInitialize = function (attrs) {
         const newAttrs = {};
         if (attrs.name === 'test') {
@@ -19,6 +23,7 @@ function createObject(type, options) {
       };
       break;
     case 'after':
+      BasicObject.has({ name: { is: 'rw' } });
       BasicObject.prototype.afterInitialize = function () {
         if (this.name === 'test') this.name = 'done';
       };
@@ -36,11 +41,14 @@ describe('Initializing a new object', () => {
       expect(basicObject)
         .to.eql({});
     });
-    it('with values', () => {
-      const basicObject = createObject('normal', { name: 'test' });
-      expect(basicObject)
-        .to.have.property('name')
-        .to.equal('test');
+    describe('with values', () => {
+      it("without any 'has'");
+      it("with a 'has'", () => {
+        const basicObject = createObject('has', { name: 'test' });
+        expect(basicObject)
+          .to.have.property('name')
+          .to.equal('test');
+      });
     });
   });
   describe('Overriding initializer hooks', () => {
