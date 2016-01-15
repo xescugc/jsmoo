@@ -7,6 +7,14 @@ function _typeValidation(value, expectedType) {
   return true;
 }
 
+function _requireValidation() {
+  Object.keys(this._jsmoo_._has_).forEach(attr => {
+    if (this._jsmoo_._has_[attr].required && (this._jsmoo_[attr] === undefined || this._jsmoo_[attr] === null)) {
+      throw new TypeError(`The attribute '${attr}' is required`);
+    }
+  });
+}
+
 function _executeDefault(attr) {
   const defaultValue = this._jsmoo_._has_[attr].default;
   const value = typeof defaultValue === 'function' ? defaultValue.bind(this)() : defaultValue;
@@ -53,6 +61,7 @@ class Jsmoo {
     if (typeof this.beforeInitialize === 'function') newAttrs = this.beforeInitialize(attrs);
     const initializedAttr = Object.keys(newAttrs);
     initializedAttr.forEach(attr => _initializeAttribute.bind(this, attr, newAttrs[attr])());
+    _requireValidation.bind(this)();
     Object.keys(this._jsmoo_._has_).filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
       if (this._jsmoo_._has_[attr].default !== undefined) this._jsmoo_[attr] = _executeDefault.bind(this, attr)();
     });
