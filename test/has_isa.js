@@ -56,5 +56,10 @@ describe('Test HAS with { ISA } option', () => {
   describe('of type BOOLEAN', () => {
     makeTypeTest('boolean', true, 'string', '');
   });
+  describe('of custom type', () => {
+    class TestClassType {}
+    const testClasType = new TestClassType();
+    makeTypeTest(TestClassType, testClasType, 'string', '');
+  });
   it('of type FUNCTION');
 });
