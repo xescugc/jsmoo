@@ -4,8 +4,8 @@
   "description": "JavaScript Minimalist Object Orientation",
   "main": "lib/index.js",
   "scripts": {
-    "watch": "./node_modules/watch/cli.js 'npm run lint && npm run test' src/ test/ -d",
-    "test": "./node_modules/mocha/bin/mocha --require babel-register",
+    "watch": "./node_modules/watch/cli.js 'npm run lint && npm run test' src/ test/ -d 2>/dev/null",
+    "test": "./node_modules/mocha/bin/mocha",
     "lint": "./node_modules/eslint/bin/eslint.js src/ test/",
     "build": "./node_modules/babel-cli/bin/babel.js src -d lib"
   },

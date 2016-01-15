@@ -11,7 +11,6 @@ describe("Test 'has'", () => {
       expect(() => createObjectWith('test', 'name', {})).to.throw(TypeError);
     });
   });
-  it('with { REQUIRE } option');
   it('with { COERCE } option');
   it('with { TRIGGER } option');
   it('with { PREDICATE } option');
