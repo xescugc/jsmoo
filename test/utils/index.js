@@ -1,4 +1,4 @@
-import Jsmoo from '../../src';
+import Jsmoo, { Role } from '../../src';
 
 function createObjectWith(value, name, attrOpts, opts = {}) {
   class BasicObject extends Jsmoo {}
@@ -17,4 +17,11 @@ function createObjectWith(value, name, attrOpts, opts = {}) {
   return new BasicObject();
 }
 
+function buildRoleWith() {
+  class TestRole extends Role {}
+
+  return TestRole;
+}
+
 export { createObjectWith };
+export { buildRoleWith };
