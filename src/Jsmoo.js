@@ -1,3 +1,5 @@
+import Role from './Role';
+
 function _typeValidation(value, expectedType) {
   let foundType = typeof value;
   if (Array.isArray(value)) foundType = 'array';
@@ -50,10 +52,22 @@ function _initializeAttribute(attr, value) {
   this._jsmoo_[attr] = value;
 }
 
+function _composeRole(role) {
+  if (Object.getPrototypeOf(role) !== Role) throw new TypeError('Only Roles can be composed');
+
+  Object.getOwnPropertyNames(role.prototype).concat(Object.getOwnPropertySymbols(role.prototype)).forEach((prop) => {
+    if (prop.match(/^(?:constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/)) return;
+    Object.defineProperty(this.prototype, prop, Object.getOwnPropertyDescriptor(role.prototype, prop));
+  });
+}
+
 class Jsmoo {
   static has(attrs) {
     if (!this.prototype._jsmoo_) this.prototype._jsmoo_ = { _has_: {} };
     Object.keys(attrs).forEach(attr => _defineAttribute.bind(this, attr, attrs[attr])());
+  }
+  static with(...roles) {
+    roles.forEach(r => _composeRole.bind(this, r)());
   }
   constructor(attrs = {}) {
     if (!this._jsmoo_) return;

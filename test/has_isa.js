@@ -62,4 +62,5 @@ describe('Test HAS with { ISA } option', () => {
     makeTypeTest(TestClassType, testClasType, 'string', '');
   });
   it('of type FUNCTION');
+  it('of type DATE');
 });

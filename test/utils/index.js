@@ -1,7 +1,13 @@
 import Jsmoo, { Role } from '../../src';
 
-function createObjectWith(value, name, attrOpts, opts = {}) {
+function buildObject() {
   class BasicObject extends Jsmoo {}
+
+  return BasicObject;
+}
+
+function createObjectWith(value, name, attrOpts, opts = {}) {
+  const BasicObject = buildObject();
 
   if (opts.multi) {
     BasicObject.has({
@@ -25,3 +31,4 @@ function buildRoleWith() {
 
 export { createObjectWith };
 export { buildRoleWith };
+export { buildObject };

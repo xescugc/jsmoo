@@ -1,8 +1,12 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { createObjectWith } from './utils';
+import Jsmoo from '../src';
 
 describe("Test 'has'", () => {
+  it('must have fuction has', () => {
+    expect(Jsmoo).to.have.property('has');
+  });
   describe('with options', () => {
     it('beeing undefined', () => {
       expect(() => createObjectWith('test', 'name', undefined)).to.throw(TypeError);
