@@ -47,7 +47,7 @@ With Jsmoo:
     name:     { is: 'rw', isa: 'stirng', required: true },
     surname:  { is: 'rw', isa: 'string' },
     age:      { is: 'rw', isa: 'number', default: 18 },
-  })
+  });
 
   const client = new Client({name: 'Pepito', surname: 'Grillo'});
   console.log(client.fullName());
@@ -84,7 +84,7 @@ _Example:_
   });
 
   const file = new File({filename: 'photo.jpg'});
-  console.log(file.extension)
+  console.log(file.extension);
   //  => '.jpg'
 ```
 
@@ -122,7 +122,7 @@ __Example:__
 
   File.has({
     filename: { is: 'ro' }
-  })
+  });
 
 ```
 
@@ -161,7 +161,7 @@ __Example:__
     address:  { is: 'rw', isa: 'object' },
     valid:    { is: 'rw', isa: 'boolean'},
     city:     { is: 'rw', isa: City },
-  })
+  });
 
   const city = new City();
 
@@ -171,10 +171,35 @@ __Example:__
     address: {},
     valid: true,
     city: city,
-  })
+  });
 ```
 
 ### default
+
+It defines a default value of an attribute if no one is given in the initialization, it can be a simple value o a function, the function has the `this` context of the Class but if you try to access some attribute that it's also default, you may, or may not, get the value you expect.
+
+__Example:__
+
+```js
+  class Client extends Jsmoo { }
+
+  Client.has({
+    email:    { is: 'rw' }
+    name:     { is: 'rw', default() { return this.email.split('@')[0] },
+    valid:    { is: 'rw', isa: 'boolean', default: true },
+    created:  { is: 'rw', default() { return new Date }},
+  });
+
+  const client = new Client({
+    email: 'pepitogrillo@gmail.com'
+  });
+
+  client.name     // pepitogrillo
+  client.valid    // true
+  client.created  // Date
+
+```
+
 ### required
 ## with
 # Role
