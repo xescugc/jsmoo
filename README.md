@@ -44,7 +44,7 @@ With Jsmoo:
   }
 
   Client.has({
-    name:     { is: 'rw', isa: 'stirng', required: true },
+    name:     { is: 'rw', isa: 'string', required: true },
     surname:  { is: 'rw', isa: 'string' },
     age:      { is: 'rw', isa: 'number', default: 18 },
   });
@@ -80,7 +80,7 @@ _Example:_
 
   File.has({
     extension:  { is: 'ro', isa: 'string', required: true },
-    filename:   { is: 'ro', isa: 'stirng', required: true },
+    filename:   { is: 'ro', isa: 'string', required: true },
   });
 
   const file = new File({filename: 'photo.jpg'});
@@ -102,7 +102,7 @@ _Example:_
   }
 
   File.has({
-    filename:   { is: 'ro', isa: 'stirng', required: true },
+    filename:   { is: 'ro', isa: 'string', required: true },
   });
 
   const file = new File({filename: 'photo.jpg'});
