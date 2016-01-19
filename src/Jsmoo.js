@@ -3,7 +3,7 @@ import Role from './Role';
 function _typeValidation(value, expectedType) {
   let foundType = typeof value;
   if (Array.isArray(value)) foundType = 'array';
-  if (foundType !== expectedType && value.constructor !== expectedType) {
+  if (foundType !== expectedType && value.constructor.name !== expectedType) {
     throw new TypeError(`Invalid type for the attribute name, it must be '${expectedType}' found '${foundType}'`);
   }
   return true;

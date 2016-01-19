@@ -59,8 +59,8 @@ describe('Test HAS with { ISA } option', () => {
   describe('of custom type', () => {
     class TestClassType {}
     const testClasType = new TestClassType();
-    makeTypeTest(TestClassType, testClasType, 'string', '');
+    makeTypeTest('TestClassType', testClasType, 'string', '');
   });
-  it('of type FUNCTION');
+  it('of type FUNCTION (custom validation)');
   it('of type DATE');
 });

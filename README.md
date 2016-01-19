@@ -146,7 +146,7 @@ It defines the type of the attribute, it can have the following values:
   * `array`
   * `boolean`
   * `object`
-  * Custom
+  * Your types
 
 Each of this types is defined as string on the `isa` except for the `Custom` which is the class of the type:
 
@@ -160,7 +160,7 @@ __Example:__
     age:      { is: 'rw', isa: 'number' },
     address:  { is: 'rw', isa: 'object' },
     valid:    { is: 'rw', isa: 'boolean'},
-    city:     { is: 'rw', isa: City },
+    city:     { is: 'rw', isa: 'City' }, // Your types
   });
 
   const city = new City();
