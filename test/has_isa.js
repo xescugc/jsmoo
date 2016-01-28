@@ -2,7 +2,8 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { createObjectWith } from './utils';
 
-function makeTypeTest(validType, validExample, invalidType, invalidExample) {
+function makeTypeTest(validType, validExample, invalidType, invalidExample, opts = {}) {
+  const messageError = opts.error ? opts.error : `Invalid type for the attribute name, it must be '${validType}' found '${invalidType}'`;
   describe('initializing the object with the attribute', () => {
     it('with valid type', () => {
       const obj = createObjectWith(validExample, 'name', { is: 'rw', isa: validType });
@@ -11,7 +12,7 @@ function makeTypeTest(validType, validExample, invalidType, invalidExample) {
     it('with invalid type', () => {
       expect(() => {
         createObjectWith(invalidExample, 'name', { is: 'rw', isa: validType });
-      }).to.throw(TypeError, `Invalid type for the attribute name, it must be '${validType}' found '${invalidType}'`);
+      }).to.throw(TypeError, messageError);
     });
   });
   describe('setting it after the initialization', () => {
@@ -24,7 +25,7 @@ function makeTypeTest(validType, validExample, invalidType, invalidExample) {
       const obj = createObjectWith(undefined, 'name', { is: 'rw', isa: validType });
       expect(() => {
         obj.name = invalidExample;
-      }).to.throw(TypeError, `Invalid type for the attribute name, it must be '${validType}' found '${invalidType}'`);
+      }).to.throw(TypeError, messageError);
     });
   });
   describe('setting it for default', () => {
@@ -35,7 +36,7 @@ function makeTypeTest(validType, validExample, invalidType, invalidExample) {
     it('with invalid type', () => {
       expect(() => {
         createObjectWith(undefined, 'name', { is: 'rw', isa: validType, default: invalidExample });
-      }).to.throw(TypeError, `Invalid type for the attribute name, it must be '${validType}' found '${invalidType}'`);
+      }).to.throw(TypeError, messageError);
     });
   });
 }
@@ -43,24 +44,36 @@ function makeTypeTest(validType, validExample, invalidType, invalidExample) {
 describe('Test HAS with { ISA } option', () => {
   describe('of type ARRAY', () => {
     makeTypeTest('array', [], 'string', '');
+    makeTypeTest('Array', [], 'string', '');
   });
   describe('of type STRING', () => {
     makeTypeTest('string', '', 'array', []);
+    makeTypeTest('String', '', 'array', []);
   });
   describe('of type NUMBER', () => {
     makeTypeTest('number', 1, 'string', '');
+    makeTypeTest('Number', 1, 'string', '');
   });
   describe('of type OBJECT', () => {
     makeTypeTest('object', {}, 'string', '');
+    makeTypeTest('Object', {}, 'string', '');
   });
   describe('of type BOOLEAN', () => {
     makeTypeTest('boolean', true, 'string', '');
+    makeTypeTest('Boolean', true, 'string', '');
+  });
+  describe('of type DATE', () => {
+    makeTypeTest('Date', new Date, 'string', '');
   });
   describe('of custom type', () => {
     class TestClassType {}
     const testClasType = new TestClassType();
     makeTypeTest('TestClassType', testClasType, 'string', '');
   });
-  it('of type FUNCTION (custom validation)');
+  describe('of type FUNCTION (custom validation)', () => {
+    makeTypeTest((value) => {
+      if (value % 2 !== 0) throw new TypeError('Custom Error');
+    }, 2, undefined, 3, { error: 'Custom Error' });
+  });
   it('of type DATE');
 });

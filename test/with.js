@@ -22,15 +22,28 @@ describe("Role composition with 'WITH'", () => {
     }).not.to.throw(TypeError, 'Only Roles can be composed');
   });
   describe('must merge the ROLE to the Class', () => {
-    it('if a function is not defined on the Class it must be copyed', () => {
-      const Obj = buildObject();
-      const Role = buildRoleWith();
-      Role.prototype.testFunction = () => { return 'from role'; };
-      Obj.with(Role);
-      const newObj = new Obj();
-      expect(newObj).respondTo('testFunction');
-      expect(newObj.testFunction()).to.equal('from role');
+    describe('instance function', () => {
+      it('is not defined on the Class it must be copyed', () => {
+        const Obj = buildObject();
+        const Role = buildRoleWith();
+        Role.prototype.testFunction = () => { return 'from role'; };
+        Obj.with(Role);
+        const newObj = new Obj();
+        expect(newObj).to.respondTo('testFunction');
+        expect(newObj.testFunction()).to.equal('from role');
+      });
+      it('is defined on the Class it must not be copyed');
     });
-    it('if a function is defined on the Class it must not be copyed');
+    describe('class function', () => {
+      it('is not defined on the Class it must be copyed', () => {
+        const Obj = buildObject();
+        const Role = buildRoleWith();
+        Role.testFunction = () => { return 'from role'; };
+        Obj.with(Role);
+        expect(Obj).itself.to.respondTo('testFunction');
+        expect(Obj.testFunction()).to.equal('from role');
+      });
+      it('is defined on the Class it must not be copyed');
+    });
   });
 });

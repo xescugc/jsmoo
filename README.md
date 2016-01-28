@@ -147,13 +147,19 @@ It defines the type of the attribute, it can have the following values:
   * `boolean`
   * `object`
   * Your types
+  * Custom validations
 
-Each of this types is defined as string on the `isa` except for the `Custom` which is the class of the type:
+
+Each of this types is defined as string on the `isa` except for the 'Custom validations' which are functions that validates the type value, to declare a value invalid you have to throw a function.
 
 __Example:__
 
 ``` js
   class Client extends Jsmoo { }
+
+  function isEven(value) {
+    if (value % 2 !== 0) throw new Error('Not even value')
+  }
 
   Client.has({
     name:     { is: 'rw', isa: 'string' },
@@ -161,6 +167,7 @@ __Example:__
     address:  { is: 'rw', isa: 'object' },
     valid:    { is: 'rw', isa: 'boolean'},
     city:     { is: 'rw', isa: 'City' }, // Your types
+    even:     { is: 'rw', isa: isEven }, // Your custom validation
   });
 
   const city = new City();
@@ -171,6 +178,7 @@ __Example:__
     address: {},
     valid: true,
     city: city,
+    even: 2,
   });
 ```
 
@@ -180,8 +188,8 @@ It defines a default value of an attribute if no one is given in the initializat
 
 __Example:__
 
-```js
-  class Client extends Jsmoo { }
+``` js
+  class Client extends Jsmoo {}
 
   Client.has({
     email:    { is: 'rw' }
@@ -201,5 +209,59 @@ __Example:__
 ```
 
 ### required
+
+It describes the attribute as `required` as a boolean value, which means that it must be (if true) one of the parameters on initialization time, if it's not present it will fail loudly.
+
+__Example:__
+
+``` js
+  class Client extends Jsmoo {}
+
+  Client.has({
+    name: { is: 'rw', required: true }
+  })
+```
+
 ## with
+
+It's the way to acomplis composition, there are som rules for composition:
+
+  * Only `Roles` can be composed
+
+The instance and class functions wull be composed to the main Class.
+
+Example:
+
+``` js
+  import Jsmoo, { Role } from 'jsmoo'
+
+  class Person extends Jsmoo {}
+
+  class AddressRole extends Role {
+    static staticFunction() {
+      return 'static'
+    }
+    instanceFunction() {
+      return this.name
+    }
+  }
+
+  Person.with(AddressRole)
+
+  Person.has({
+    name: { is: 'rw' }
+  })
+
+  Person.staticFunction()
+  # => 'static'
+
+  let person = new Person({ name: 'Pepito })
+
+  person.instanceFunction()
+  # => 'Pepito'
+```
+
 # Role
+
+Roles are the way to composition
+

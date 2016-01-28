@@ -2,6 +2,7 @@ import Role from './Role';
 
 function _typeValidation(value, expectedType) {
   let foundType = typeof value;
+  if (typeof expectedType === 'function') return expectedType(value);
   if (Array.isArray(value)) foundType = 'array';
   if (foundType !== expectedType && value.constructor.name !== expectedType) {
     throw new TypeError(`Invalid type for the attribute name, it must be '${expectedType}' found '${foundType}'`);
@@ -55,9 +56,11 @@ function _initializeAttribute(attr, value) {
 function _composeRole(role) {
   if (Object.getPrototypeOf(role) !== Role) throw new TypeError('Only Roles can be composed');
 
-  Object.getOwnPropertyNames(role.prototype).concat(Object.getOwnPropertySymbols(role.prototype)).forEach((prop) => {
-    if (prop.match(/^(?:constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/)) return;
-    Object.defineProperty(this.prototype, prop, Object.getOwnPropertyDescriptor(role.prototype, prop));
+  [{ base: this, role }, { base: this.prototype, role: role.prototype }].forEach(proto => {
+    Object.getOwnPropertyNames(proto.role).concat(Object.getOwnPropertySymbols(proto.role)).forEach((prop) => {
+      if (prop.match(/^(?:constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/)) return;
+      Object.defineProperty(proto.base, prop, Object.getOwnPropertyDescriptor(proto.role, prop));
+    });
   });
 }
 
