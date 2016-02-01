@@ -9,9 +9,9 @@
     "lint": "./node_modules/eslint/bin/eslint.js src/ test/",
     "build": "./node_modules/babel-cli/bin/babel.js src -d lib",
     "prepublish": "npm run lint && npm run test && npm run build",
-    "publishMajor": "npm run prepublish && npm version majori -m \"Bumped to version %s\" && git push && npm publish",
-    "publishMinor": "npm run prepublish && npm version minor -m \"Bumped to version %s\" && git push && npm publish",
-    "publishPatch": "npm run prepublish && npm version patch -m \"Bumped to version %s\" && git push && npm publish"
+    "publishMajor": "npm run prepublish && npm version majori -m \"Bump to version %s\" && git push && npm publish",
+    "publishMinor": "npm run prepublish && npm version minor -m \"Bump to version %s\" && git push && npm publish",
+    "publishPatch": "npm run prepublish && npm version patch -m \"Bump to version %s\" && git push && npm publish"
   },
   "repository": {
     "type": "git",
