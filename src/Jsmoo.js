@@ -79,10 +79,11 @@ class Jsmoo {
     if (!this._jsmoo_) return;
     let newAttrs = attrs;
     if (typeof this.beforeInitialize === 'function') newAttrs = this.beforeInitialize(attrs);
-    const initializedAttr = Object.keys(newAttrs);
+    const hasAttr = Object.keys(this._jsmoo_._has_);
+    const initializedAttr = Object.keys(newAttrs).filter(k => hasAttr.indexOf(k) >= 0 ? true : false);
     initializedAttr.forEach(attr => _initializeAttribute.bind(this, attr, newAttrs[attr])());
     _requireValidation.bind(this)();
-    Object.keys(this._jsmoo_._has_).filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
+    hasAttr.filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
       if (Object.keys(this._jsmoo_._has_[attr]).indexOf('default') >= 0) this._jsmoo_[attr] = _executeDefault.bind(this, attr)();
     });
     if (typeof this.afterInitialize === 'function') this.afterInitialize.bind(this)();
