@@ -19,7 +19,7 @@ function createObjectWith(value, name, attrOpts, opts = {}) {
     name: attrOpts,
   });
 
-  if (value !== undefined) return new BasicObject({ name: value });
+  if (value !== undefined || opts.forceSet) return new BasicObject({ name: value });
   return new BasicObject();
 }
 

@@ -4,7 +4,8 @@ function _typeValidation(value, expectedType) {
   let foundType = typeof value;
   if (typeof expectedType === 'function') return expectedType(value);
   if (Array.isArray(value)) foundType = 'array';
-  if (foundType !== expectedType && value.constructor.name !== expectedType) {
+  if (value === null) foundType = 'null';
+  if ((value === null || value === undefined) || (foundType !== expectedType && value.constructor.name !== expectedType)) {
     throw new TypeError(`Invalid type for the attribute name, it must be '${expectedType}' found '${foundType}'`);
   }
   return true;
@@ -21,7 +22,9 @@ function _requireValidation() {
 function _executeDefault(attr) {
   const defaultValue = this._jsmoo_._has_[attr].default;
   const value = typeof defaultValue === 'function' ? defaultValue.bind(this)() : defaultValue;
-  if (this._jsmoo_._has_[attr].isa) _typeValidation(value, this._jsmoo_._has_[attr].isa);
+  if (this._jsmoo_._has_[attr].isa) {
+    _typeValidation(value, this._jsmoo_._has_[attr].isa);
+  }
   return value;
 }
 
@@ -80,7 +83,7 @@ class Jsmoo {
     initializedAttr.forEach(attr => _initializeAttribute.bind(this, attr, newAttrs[attr])());
     _requireValidation.bind(this)();
     Object.keys(this._jsmoo_._has_).filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
-      if (this._jsmoo_._has_[attr].default !== undefined) this._jsmoo_[attr] = _executeDefault.bind(this, attr)();
+      if (Object.keys(this._jsmoo_._has_[attr]).indexOf('default') >= 0) this._jsmoo_[attr] = _executeDefault.bind(this, attr)();
     });
     if (typeof this.afterInitialize === 'function') this.afterInitialize.bind(this)();
   }

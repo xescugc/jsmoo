@@ -11,7 +11,7 @@ function makeTypeTest(validType, validExample, invalidType, invalidExample, opts
     });
     it('with invalid type', () => {
       expect(() => {
-        createObjectWith(invalidExample, 'name', { is: 'rw', isa: validType });
+        createObjectWith(invalidExample, 'name', { is: 'rw', isa: validType }, { forceSet: true });
       }).to.throw(TypeError, messageError);
     });
   });
@@ -64,6 +64,12 @@ describe('Test HAS with { ISA } option', () => {
   });
   describe('of type DATE', () => {
     makeTypeTest('Date', new Date, 'string', '');
+  });
+  describe('with a undefined value', () => {
+    makeTypeTest('String', '', 'undefined', undefined);
+  });
+  describe('with a null value', () => {
+    makeTypeTest('String', '', 'null', null);
   });
   describe('of custom type', () => {
     class TestClassType {}
