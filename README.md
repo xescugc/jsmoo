@@ -255,7 +255,7 @@ Example:
   Person.staticFunction()
   # => 'static'
 
-  let person = new Person({ name: 'Pepito })
+  let person = new Person({ name: 'Pepito' })
 
   person.instanceFunction()
   # => 'Pepito'
