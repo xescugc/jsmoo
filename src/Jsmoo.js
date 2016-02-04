@@ -28,14 +28,21 @@ function _executeDefault(attr) {
   return value;
 }
 
+// 'this' context = { klass: this.prototype, opts, attr }
 function _defineSetter(newValue) {
   if (this.opts.isa) _typeValidation(newValue, this.opts.isa);
   if (this.opts.is === 'ro') throw new TypeError(`Can not set to a RO attribute ${this.attr}`);
   this.klass._jsmoo_[this.attr] = newValue;
 }
 
+// 'this' context = { klass: this.prototype, opts, attr }
 function _defineGetter() {
-  return this.klass._jsmoo_[this.attr];
+  let value = this.klass._jsmoo_[this.attr];
+  if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('default') >= 0) {
+    value = _executeDefault.bind(this.klass)(this.attr);
+    this.klass._jsmoo_[this.attr] = value;
+  }
+  return value;
 }
 
 function _defineAttribute(attr, opts) {
@@ -84,7 +91,7 @@ class Jsmoo {
     initializedAttr.forEach(attr => _initializeAttribute.bind(this, attr, newAttrs[attr])());
     _requireValidation.bind(this)();
     hasAttr.filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
-      if (Object.keys(this._jsmoo_._has_[attr]).indexOf('default') >= 0) this._jsmoo_[attr] = _executeDefault.bind(this, attr)();
+      if (Object.keys(this._jsmoo_._has_[attr]).indexOf('default') >= 0 && !this._jsmoo_._has_[attr].lazy) this._jsmoo_[attr] = _executeDefault.bind(this, attr)();
     });
     if (typeof this.afterInitialize === 'function') this.afterInitialize.bind(this)();
   }
