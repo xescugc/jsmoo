@@ -1,2 +1,2 @@
 --require babel-register
---reporter nyan
+--reporter spec

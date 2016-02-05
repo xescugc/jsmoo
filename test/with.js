@@ -45,5 +45,42 @@ describe("Role composition with 'WITH'", () => {
       });
       it('is defined on the Class it must not be copyed');
     });
+    describe('{ HAS } attributes', () => {
+      it('must have them on the class', () => {
+        const Obj = buildObject();
+        const Role = buildRoleWith();
+        Role.has({ name: { is: 'rw', default: 'role' } });
+        Obj.with(Role);
+        const obj = new Obj();
+        expect(obj).to.have.property('name').to.equal('role');
+      });
+      it('must not have them on the class if they are defined on it', () => {
+        const Obj = buildObject();
+        const Role = buildRoleWith();
+        Obj.has({ name: { is: 'rw', default: 'object' } });
+        Role.has({ name: { is: 'rw', default: 'role' } });
+        Obj.with(Role);
+        const obj = new Obj();
+        expect(obj).to.have.property('name').to.equal('object');
+      });
+      it('must have them on the class if the attribute has a "+" on the role', () => {
+        const Obj = buildObject();
+        const Role = buildRoleWith();
+        Obj.has({ name: { is: 'rw', default: 'object' } });
+        Role.has({ '+name': { is: 'rw', default: 'role' } });
+        Obj.with(Role);
+        const obj = new Obj();
+        expect(obj).to.have.property('name').to.equal('role');
+      });
+      it('must throw error if the override is not on the main class', () => {
+        const Obj = buildObject();
+        const Role = buildRoleWith();
+        Obj.has({ name: { is: 'rw', default: 'object' } });
+        Role.has({ '+pepe': { is: 'rw', default: 'role' } });
+        expect(() => {
+          Obj.with(Role);
+        }).to.throw(TypeError, "Can't override an unexistent attribute 'pepe'");
+      });
+    });
   });
 });
