@@ -9,32 +9,34 @@
                                                      
 
 ```
-1. [Jsmoo](#jsmoo)
-2. [Installation](#installation)
-3. [Simple Example](#simpleexample)
-4. [API](#api)
-4.1. [beforeInitialize](#beforeinitialize)
-4.2. [afterInitialize](#afterinitialize)
-4.3. [has](#has)
-4.3.1. [is](#is)
-4.3.2. [isa](#isa)
-4.3.3. [default](#default)
-4.3.4. [required](#required)
-4.3.5. [lazy](#lazy)
-4.4. [with](#with)
-5. [Role](#role)
+  * [Jsmoo](#jsmoo)
+  * [Installation](#installation)
+  * [Simple Example](#simpleexample)
+  * [API](#api)
+    * [beforeInitialize](#beforeinitialize)
+    * [afterInitialize](#afterinitialize)
+    * [has](#has)
+      * [is](#is)
+      * [isa](#isa)
+      * [default](#default)
+      * [required](#required)
+      * [lazy](#lazy)
+      * [with](#with)
+  * [Role](#role)
 
-# jsmoo
+# Jsmoo
 
-Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Classes and Roles with a simple API. It's inpired for the Perl library called [Moo](https://metacpan.org/pod/Moo) and [Moose](https://metacpan.org/pod/Moose). It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`with` and `Role`) and much more.
+Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Classes and Roles with a simple API. It's inpired for the Perl library called [Moo][moo] and [Moose][moose]. It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`with` and `Role`) and much more.
 
-# Install
+# Installation
 
 With npm:
 
 ``` js
   $> npm install --save jsmoo
 ```
+
+<a name='simpleexample'>
 
 # Simple Example
 
@@ -294,7 +296,7 @@ __Example:__
   }
 
   AddressRole.has({
-    address: { is: 'rw', default: 'C/ To Pepi }
+    address: { is: 'rw', default: 'C/ To Pepi' }
   })
 
   export default AddressRole;
@@ -332,3 +334,6 @@ Roles are the way to achive composition, they are similar to the Jsmoo class but
   * Roles can not be initialized.
 
 Roles also have the `has` static function to define attributes, wich then will be extended to the main Jsmoo Class.
+
+[moo]: https://metacpan.org/pod/Moo
+[moose]: https://metacpan.org/pod/Moose
