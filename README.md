@@ -1,6 +1,32 @@
+```
+                         _                           
+                        | |                          
+                        | |___ _ __ ___   ___   ___  
+                    _   | / __| '_ ` _ \ / _ \ / _ \ 
+                   | |__| \__ \ | | | | | (_) | (_) |
+                    \____/|___/_| |_| |_|\___/ \___/ 
+                                                     
+                                                     
+
+```
+1. [Jsmoo](#jsmoo)
+2. [Installation](#installation)
+3. [Simple Example](#simpleexample)
+4. [API](#api)
+4.1. [beforeInitialize](#beforeinitialize)
+4.2. [afterInitialize](#afterinitialize)
+4.3. [has](#has)
+4.3.1. [is](#is)
+4.3.2. [isa](#isa)
+4.3.3. [default](#default)
+4.3.4. [required](#required)
+4.3.5. [lazy](#lazy)
+4.4. [with](#with)
+5. [Role](#role)
+
 # jsmoo
 
-Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Objects and Roles with a simple API. It's is a port from the Perl library called [Moo](https://metacpan.org/pod/Moo). It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`with` and `Role`) and much more.
+Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Classes and Roles with a simple API. It's inpired for the Perl library called [Moo](https://metacpan.org/pod/Moo) and [Moose](https://metacpan.org/pod/Moose). It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`with` and `Role`) and much more.
 
 # Install
 
@@ -17,6 +43,11 @@ Without Jsmoo:
 ``` js
   class Client extends Jsmoo {
     constructor({name, surname, age = 18}) {
+      if (!name) throw new Error('... some error ...');
+      if (typeof name !== 'string') throw new Error('... some error ...');
+      if (typeof age !== 'number') throw new Error('... some error ...');
+      if (typeof surname !== 'string') throw new Error('... some error ...');
+
       this.name = name;
       this.surname = surname;
       this.age = age;
@@ -54,6 +85,8 @@ With Jsmoo:
   //  => 'Pepito Grillo'
 ```
 
+The example without Jsmoo it's not the same of the one with Jsmoo, because to write the access validation `is` is so much code :) but you get the point, no?
+
 # API
 
 The module itself exports more than one module:
@@ -62,7 +95,7 @@ The module itself exports more than one module:
   import Jsmoo, { Role } from 'jsmoo';
 ```
 
-The way the objects are initialized is with a Object, where the keys are the attributes defined on the `has`.
+The way the Classes are initialized is with a plain Object, where the keys are the attributes defined on the `has`.
 
 ## beforeInitialize
 
@@ -111,7 +144,7 @@ _Example:_
 
 ## has
 
-Has provides the core functionallity of this module, define the attributes of the class as easy as possible with a cler way. This method is a `static` method of the Class that has extended from `Jsmoo`.
+Has provides the core functionallity of this module, define the attributes of the Class as easy as possible with a cler way. This method is a `static` method of the Class that has extended from `Jsmoo`.
 
 It expects a Object as parameters and each key of this object will become an attribute of the class. The configuration of the attribute is the value of the attribute key.
 
@@ -141,16 +174,16 @@ If you try to change a `ro` attribute it will raise an error.
 
 It defines the type of the attribute, it can have the following values:
 
-  * `string`
-  * `number`
-  * `array`
-  * `boolean`
-  * `object`
+  * `string` or `String`
+  * `number` or `Number`
+  * `array` or `Array`
+  * `boolean` or `Boolean`
+  * `object` or `Object`
   * Your types
   * Custom validations
 
 
-Each of this types is defined as string on the `isa` except for the 'Custom validations' which are functions that validates the type value, to declare a value invalid you have to throw a function.
+Each of this types is defined as string on the `isa` except for the 'Custom validations' which are functions that validates the type value, to declare a value as invalid you have to throw an error.
 
 __Example:__
 
@@ -184,7 +217,7 @@ __Example:__
 
 ### default
 
-It defines a default value of an attribute if no one is given in the initialization, it can be a simple value o a function, the function has the `this` context of the Class but if you try to access some attribute that it's also default, you may, or may not, get the value you expect.
+It defines a default value of an attribute if no one is given in the initialization, it can be a simple value or a function, the function has the `this` context of the Class but if you try to access some attribute that it's also default, you may, or may not, get the value you expect, if you want this behavior you shoud define the attributte you want to access as `lazy`.
 
 __Example:__
 
@@ -222,20 +255,34 @@ __Example:__
   })
 ```
 
+### lazy
+
+The attributes defined as `lazy` will be instanciated only when the attribute is called.
+
+```js
+  class Client extends Jsmoo {}
+
+  Clint.has({
+    name: { is: 'rw', lazy: true }
+  })
+```
+
 ## with
 
-It's the way to acomplis composition, there are som rules for composition:
+It's the way to acomplish composition, there are some rules for Role composition:
 
-  * Only `Roles` can be composed
+  * Only `Roles` can be composed.
+  * Roles can `override` existing attributes with the `+` sign.
+  * Classes can `override` existing attributes with the sign `+` sign.
+  * If one of the _overrided_ attributes is not declated (with has) before the declaration of the _override_ it will fail loudly.
 
-The instance and class functions wull be composed to the main Class.
+The instance and class functions will be composed to the main Class and also the attributes defined with `has`.
 
-Example:
+__Example:__
 
 ``` js
-  import Jsmoo, { Role } from 'jsmoo'
-
-  class Person extends Jsmoo {}
+  //------- address_role.js
+  import Jsmoo, { Role } from 'jsmoo';
 
   class AddressRole extends Role {
     static staticFunction() {
@@ -246,22 +293,42 @@ Example:
     }
   }
 
+  AddressRole.has({
+    address: { is: 'rw', default: 'C/ To Pepi }
+  })
+
+  export default AddressRole;
+
+  //------- person.js
+  import Jsmoo, { Role } from 'jsmoo';
+  import AddressRole from './address_role';
+
+  class Person extends Jsmoo {}
+
   Person.with(AddressRole)
 
   Person.has({
-    name: { is: 'rw' }
+    name:       { is: 'rw' },
+    '+address': { default: 'C/ Pepi To' },
   })
 
   Person.staticFunction()
-  # => 'static'
+  // => 'static'
 
   let person = new Person({ name: 'Pepito' })
 
   person.instanceFunction()
-  # => 'Pepito'
+  // => 'Pepito'
+
+  person.address
+  // => 'C/ Pepi To'
 ```
 
 # Role
 
-Roles are the way to composition
+Roles are the way to achive composition, they are similar to the Jsmoo class but with some differences:
 
+  * They are the only ones that can be composed with `with`.
+  * Roles can not be initialized.
+
+Roles also have the `has` static function to define attributes, wich then will be extended to the main Jsmoo Class.

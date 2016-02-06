@@ -71,7 +71,6 @@ describe("Test 'has'", () => {
   it('with { PREDICATE } option');
   it('with { BUILDER } option');
   it('with { CLEARER } option');
-  it('with { LAZY } option');
   it('with { READER } option');
   it('with { WRITTER } option');
 });
