@@ -36,11 +36,26 @@ function defineGetter() {
 }
 
 function defineAttribute(attr, opts) {
-  if (!opts || !opts.is) throw new TypeError("'is' key is required");
-  const context = { klass: this.prototype, opts, attr };
-  this.prototype._jsmoo_._has_[attr] = opts;
-  if (Object.getPrototypeOf(this).name === 'Role') return;
-  Object.defineProperty(this.prototype, attr, {
+  if (this.prototype._jsmoo_._has_[attr]) return;
+  let newAttr = attr;
+  let newOpts = opts;
+  const isOverride = !!newAttr.match(/^\+/);
+  if (isOverride) newAttr = attr.replace(/^\+/, '');
+
+  if (!isOverride && (!newOpts || !newOpts.is)) throw new TypeError("'is' key is required");
+  if (isOverride && this.prototype._jsmoo_._has_[newAttr]) {
+    // TODO: Remove the old property?
+    const beforeHas = this.prototype._jsmoo_._has_[newAttr];
+    newOpts = Object.assign({}, beforeHas, opts);
+  }
+  if (Object.getPrototypeOf(this).name === 'Role') {
+    this.prototype._jsmoo_._has_[attr] = opts;
+    return;
+  }
+  if (isOverride && !this.prototype._jsmoo_._has_[newAttr]) throw new TypeError(`Can't override an unexistent attribute '${newAttr}'`);
+  this.prototype._jsmoo_._has_[newAttr] = newOpts;
+  const context = { klass: this.prototype, opts: newOpts, attr: newAttr };
+  Object.defineProperty(this.prototype, newAttr, {
     configurable: true,
     enumerable:   true,
     get:          defineGetter.bind(context),
