@@ -1,3 +1,4 @@
+[![Build Status][travis-image]][travis-url]
 ```
                          _                           
                         | |                          
@@ -337,3 +338,5 @@ Roles also have the `has` static function to define attributes, wich then will b
 
 [moo]: https://metacpan.org/pod/Moo
 [moose]: https://metacpan.org/pod/Moose
+[travis-image]: https://travis-ci.org/XescuGC/jsmoo.svg?branch=master
+[travis-url]: https://travis-ci.org/XescuGC/jsmoo
