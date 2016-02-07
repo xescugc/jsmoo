@@ -68,7 +68,6 @@ describe("Test 'has'", () => {
   });
   it('with { COERCE } option');
   it('with { TRIGGER } option');
-  it('with { PREDICATE } option');
   it('with { BUILDER } option');
   it('with { CLEARER } option');
   it('with { READER } option');

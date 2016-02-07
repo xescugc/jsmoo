@@ -35,6 +35,23 @@ function defineGetter() {
   return value;
 }
 
+// 'this' context = { klass: this.prototype, opts, attr }
+function definePredicate() {
+  let predicateName;
+  if (this.attr.match(/^_/)) {
+    predicateName = `_has${this.attr[1].toUpperCase()}${this.attr.substring(2)}`;
+  } else {
+    predicateName = `has${this.attr[0].toUpperCase()}${this.attr.substring(1)}`;
+  }
+  Object.defineProperty(this.klass, predicateName, {
+    configurable: true,
+    enumerable:   true,
+    get:          () => {
+      return (this.klass._jsmoo_[this.attr] !== undefined) && (this.klass._jsmoo_[this.attr] !== null);
+    },
+  });
+}
+
 function defineAttribute(attr, opts) {
   if (this.prototype._jsmoo_._has_[attr]) return;
   let newAttr = attr;
@@ -55,6 +72,7 @@ function defineAttribute(attr, opts) {
   if (isOverride && !this.prototype._jsmoo_._has_[newAttr]) throw new TypeError(`Can't override an unexistent attribute '${newAttr}'`);
   this.prototype._jsmoo_._has_[newAttr] = newOpts;
   const context = { klass: this.prototype, opts: newOpts, attr: newAttr };
+  if (Object.keys(opts).indexOf('predicate') >= 0) definePredicate.bind(context)();
   Object.defineProperty(this.prototype, newAttr, {
     configurable: true,
     enumerable:   true,

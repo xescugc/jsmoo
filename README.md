@@ -22,7 +22,8 @@
       * [default](#default)
       * [required](#required)
       * [lazy](#lazy)
-      * [with](#with)
+      * [predicate](#predicate)
+    * [with](#with)
   * [Role](#role)
 
 # Jsmoo
@@ -262,12 +263,35 @@ __Example:__
 
 The attributes defined as `lazy` will be instanciated only when the attribute is called.
 
+__Example:__
+
 ```js
   class Client extends Jsmoo {}
 
   Clint.has({
     name: { is: 'rw', lazy: true }
-  })
+  });
+```
+
+### predicate
+
+Created a function (`has${attributeName}` if it start with _ then `_has${attributeName}`) to validate if the value is defined, wich means the values is not `undefined` or `null`
+
+__Example:__
+
+```js
+  class Client extends Jsmoo {}
+
+  Clint.has({
+    name: { is: 'rw', predicate: true }
+  });
+
+  let obj = new Client({ name: 'value' });
+  obj.hasName
+  // => true
+  obj.name = undefined;
+  obj.hasName
+  // => false
 ```
 
 ## with

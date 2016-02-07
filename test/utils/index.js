@@ -16,10 +16,10 @@ function createObjectWith(value, name, attrOpts, opts = {}) {
   }
 
   BasicObject.has({
-    name: attrOpts,
+    [name]: attrOpts,
   });
 
-  if (value !== undefined || opts.forceSet) return new BasicObject({ name: value });
+  if (value !== undefined || opts.forceSet) return new BasicObject({ [name]: value });
   return new BasicObject();
 }
 
