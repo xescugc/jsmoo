@@ -1,4 +1,4 @@
-import has, { typeValidation, requireValidation, executeDefault, defineAttribute } from './has';
+import has, { typeValidation, requireValidation, executeDefault } from './has';
 import withRoles from './with';
 
 function initializeAttribute(attr, value) {

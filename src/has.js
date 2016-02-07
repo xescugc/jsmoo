@@ -52,6 +52,17 @@ function definePredicate() {
   });
 }
 
+// 'this' context = { klass: this.prototype, opts, attr }
+function defineClearer() {
+  let clearerName;
+  if (this.attr.match(/^_/)) {
+    clearerName = `_clear${this.attr[1].toUpperCase()}${this.attr.substring(2)}`;
+  } else {
+    clearerName = `clear${this.attr[0].toUpperCase()}${this.attr.substring(1)}`;
+  }
+  this.klass[clearerName] = () => this.klass[this.attr] = undefined;
+}
+
 function defineAttribute(attr, opts) {
   if (this.prototype._jsmoo_._has_[attr]) return;
   let newAttr = attr;
@@ -72,7 +83,8 @@ function defineAttribute(attr, opts) {
   if (isOverride && !this.prototype._jsmoo_._has_[newAttr]) throw new TypeError(`Can't override an unexistent attribute '${newAttr}'`);
   this.prototype._jsmoo_._has_[newAttr] = newOpts;
   const context = { klass: this.prototype, opts: newOpts, attr: newAttr };
-  if (Object.keys(opts).indexOf('predicate') >= 0) definePredicate.bind(context)();
+  if (opts.predicate) definePredicate.bind(context)();
+  if (opts.clearer) defineClearer.bind(context)();
   Object.defineProperty(this.prototype, newAttr, {
     configurable: true,
     enumerable:   true,

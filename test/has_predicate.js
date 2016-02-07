@@ -1,4 +1,3 @@
-import Jsmoo from '../src';
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { createObjectWith } from './utils';

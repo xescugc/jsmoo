@@ -23,6 +23,7 @@
       * [required](#required)
       * [lazy](#lazy)
       * [predicate](#predicate)
+      * [clearer](#clearer)
     * [with](#with)
   * [Role](#role)
 
@@ -292,6 +293,26 @@ __Example:__
   obj.name = undefined;
   obj.hasName
   // => false
+```
+### clearer
+
+Created a function (`clear${attributeName}` if it start with _ then `_clear${attributeName}`) to clear the value, which means setting it to `undefined`
+
+__Example:__
+
+```js
+  class Client extends Jsmoo {}
+
+  Clint.has({
+    name: { is: 'rw', clearer: true }
+  });
+
+  let obj = new Client({ name: 'value' });
+  obj.name
+  // => value
+  obj.clearName();
+  obj.name
+  // => undefined
 ```
 
 ## with
