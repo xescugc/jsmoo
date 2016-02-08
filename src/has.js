@@ -1,3 +1,10 @@
+function defineFunctionNameFromAttribute(prefix, attr) {
+  if (attr.match(/^_/)) {
+    return `_${prefix}${attr[1].toUpperCase()}${attr.substring(2)}`;
+  }
+  return `${prefix}${attr[0].toUpperCase()}${attr.substring(1)}`;
+}
+
 function typeValidation(value, expectedType) {
   let foundType = typeof value;
   if (typeof expectedType === 'function') return expectedType(value);
@@ -18,6 +25,15 @@ function executeDefault(attr) {
   return value;
 }
 
+function executeBuilder(attr) {
+  const defaultValue = this._jsmoo_._has_[attr].builder;
+  const value = typeof defaultValue === 'string' ? this[defaultValue]() : this[defineFunctionNameFromAttribute('build', attr)]();
+  if (this._jsmoo_._has_[attr].isa) {
+    typeValidation(value, this._jsmoo_._has_[attr].isa);
+  }
+  return value;
+}
+
 // 'this' context = { klass: this.prototype, opts, attr }
 function defineSetter(newValue) {
   if (this.opts.isa) typeValidation(newValue, this.opts.isa);
@@ -31,18 +47,16 @@ function defineGetter() {
   if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('default') >= 0) {
     value = executeDefault.bind(this.klass)(this.attr);
     this.klass._jsmoo_[this.attr] = value;
+  } else if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('builder') >= 0) {
+    value = executeBuilder.bind(this.klass)(this.attr);
+    this.klass._jsmoo_[this.attr] = value;
   }
   return value;
 }
 
 // 'this' context = { klass: this.prototype, opts, attr }
 function definePredicate() {
-  let predicateName;
-  if (this.attr.match(/^_/)) {
-    predicateName = `_has${this.attr[1].toUpperCase()}${this.attr.substring(2)}`;
-  } else {
-    predicateName = `has${this.attr[0].toUpperCase()}${this.attr.substring(1)}`;
-  }
+  const predicateName = defineFunctionNameFromAttribute('has', this.attr);
   Object.defineProperty(this.klass, predicateName, {
     configurable: true,
     enumerable:   true,
@@ -54,12 +68,7 @@ function definePredicate() {
 
 // 'this' context = { klass: this.prototype, opts, attr }
 function defineClearer() {
-  let clearerName;
-  if (this.attr.match(/^_/)) {
-    clearerName = `_clear${this.attr[1].toUpperCase()}${this.attr.substring(2)}`;
-  } else {
-    clearerName = `clear${this.attr[0].toUpperCase()}${this.attr.substring(1)}`;
-  }
+  const clearerName = defineFunctionNameFromAttribute('clear', this.attr);
   this.klass[clearerName] = () => this.klass[this.attr] = undefined;
 }
 
@@ -112,3 +121,4 @@ export { defineAttribute };
 export { requireValidation };
 export { typeValidation };
 export { executeDefault };
+export { executeBuilder };

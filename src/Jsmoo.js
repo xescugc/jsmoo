@@ -1,4 +1,4 @@
-import has, { typeValidation, requireValidation, executeDefault } from './has';
+import has, { typeValidation, requireValidation, executeDefault, executeBuilder } from './has';
 import withRoles from './with';
 
 function initializeAttribute(attr, value) {
@@ -19,7 +19,9 @@ class Jsmoo {
     requireValidation.bind(this)();
     hasAttr.filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
       if (Object.keys(this._jsmoo_._has_[attr]).indexOf('default') >= 0 && !this._jsmoo_._has_[attr].lazy) {
-        this._jsmoo_[attr] = executeDefault.bind(this, attr)();
+        this._jsmoo_[attr] = executeDefault.bind(this)(attr);
+      } else if (Object.keys(this._jsmoo_._has_[attr]).indexOf('builder') >= 0 && !this._jsmoo_._has_[attr].lazy) {
+        this._jsmoo_[attr] = executeBuilder.bind(this)(attr);
       }
     });
     if (typeof this.afterInitialize === 'function') this.afterInitialize();
