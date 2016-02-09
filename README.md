@@ -24,6 +24,7 @@
       * [lazy](#lazy)
       * [predicate](#predicate)
       * [clearer](#clearer)
+      * [builder](#builder)
     * [with](#with)
   * [Role](#role)
 
@@ -313,6 +314,25 @@ __Example:__
   obj.clearName();
   obj.name
   // => undefined
+```
+
+### builder
+
+Created a defines a function to build the attribute if not initialized, if it has a Boolean value it will call the function `build${attributeName}` (if it start with _ then `_build${attributeName}`) but you can override this by passing a string with the name of the builder function that you want, this function would have the `this` context of the class.
+
+__Example:__
+
+```js
+  class Client extends Jsmoo {}
+
+  Clint.has({
+    name: { is: 'rw', builder: true },
+    age:  { is: 'rw', builder: 'buildAgeForUser' },
+  });
+
+  Client.prototype.buildAgeForUser = function() {}
+  Client.prototype.buildName = function() {}
+
 ```
 
 ## with

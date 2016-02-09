@@ -67,3 +67,4 @@ describe('Test HAS with { BUILDER } option', () => {
   });
 });
 it('if the function is not present');
+it('test for builder and default present');
