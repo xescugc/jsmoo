@@ -65,6 +65,21 @@ describe('Test HAS with { BUILDER } option', () => {
       expect(obj).to.have.property('name').to.equal('initialized value');
     });
   });
+  describe('if the function is not present', () => {
+    it('with string', () => {
+      const Obj = buildObject();
+      Obj.has({ name: { is: 'rw', builder: 'builderNameFunction' } });
+      expect(() => {
+        new Obj();
+      }).to.throw(TypeError, "The builder function 'builderNameFunction' is not defined");
+    });
+    it('with boolean', () => {
+      const Obj = buildObject();
+      Obj.has({ name: { is: 'rw', builder: 1 } });
+      expect(() => {
+        new Obj();
+      }).to.throw(TypeError, "The builder function 'buildName' is not defined");
+    });
+  });
 });
-it('if the function is not present');
 it('test for builder and default present');

@@ -27,7 +27,15 @@ function executeDefault(attr) {
 
 function executeBuilder(attr) {
   const defaultValue = this._jsmoo_._has_[attr].builder;
-  const value = typeof defaultValue === 'string' ? this[defaultValue]() : this[defineFunctionNameFromAttribute('build', attr)]();
+  let value;
+  if (typeof defaultValue === 'string') {
+    if (!this[defaultValue]) throw new TypeError(`The builder function '${defaultValue}' is not defined`);
+    value = this[defaultValue]();
+  } else {
+    const builderFunction = defineFunctionNameFromAttribute('build', attr);
+    if (!this[builderFunction]) throw new TypeError(`The builder function '${builderFunction}' is not defined`);
+    value = this[builderFunction]();
+  }
   if (this._jsmoo_._has_[attr].isa) {
     typeValidation(value, this._jsmoo_._has_[attr].isa);
   }
