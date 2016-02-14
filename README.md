@@ -343,6 +343,7 @@ It's the way to acomplish composition, there are some rules for Role composition
   * Roles can `override` existing attributes with the `+` sign.
   * Classes can `override` existing attributes with the sign `+` sign.
   * If one of the _overrided_ attributes is not declated (with has) before the declaration of the _override_ it will fail loudly.
+  * If a function is defined in the main Class, the Role will not override it.
 
 The instance and class functions will be composed to the main Class and also the attributes defined with `has`.
 

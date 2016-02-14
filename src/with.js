@@ -2,7 +2,7 @@ function mergeAttributes({ base, role, isJsmoo }) {
   //TODO: See if some one has another work arround for Symbols
   //Object.getOwnPropertyNames(role).concat(Object.getOwnPropertySymbols(role)).forEach((prop) => {
   Object.getOwnPropertyNames(role).forEach((prop) => {
-    if (!prop.match(/^(?:_jsmoo_|constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/)) {
+    if (!prop.match(/^(?:_jsmoo_|constructor|prototype|arguments|caller|name|bind|call|apply|toString|length)$/) && !base[prop]) {
       Object.defineProperty(base, prop, Object.getOwnPropertyDescriptor(role, prop));
     }
   });

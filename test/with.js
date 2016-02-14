@@ -32,7 +32,16 @@ describe("Role composition with 'WITH'", () => {
         expect(newObj).to.respondTo('testFunction');
         expect(newObj.testFunction()).to.equal('from role');
       });
-      it('is defined on the Class it must not be copyed');
+      it('is defined on the Class it must not be copyed', () => {
+        const Obj = buildObject();
+        const Role = buildRoleWith();
+        Role.prototype.testFunction = () => { return 'from role'; };
+        Obj.prototype.testFunction = () => { return 'from object'; };
+        Obj.with(Role);
+        const newObj = new Obj();
+        expect(newObj).to.respondTo('testFunction');
+        expect(newObj.testFunction()).to.equal('from object');
+      });
     });
     describe('class function', () => {
       it('is not defined on the Class it must be copyed', () => {
@@ -43,7 +52,15 @@ describe("Role composition with 'WITH'", () => {
         expect(Obj).itself.to.respondTo('testFunction');
         expect(Obj.testFunction()).to.equal('from role');
       });
-      it('is defined on the Class it must not be copyed');
+      it('is defined on the Class it must not be copyed', () => {
+        const Obj = buildObject();
+        const Role = buildRoleWith();
+        Role.testFunction = () => { return 'from role'; };
+        Obj.testFunction = () => { return 'from object'; };
+        Obj.with(Role);
+        expect(Obj).itself.to.respondTo('testFunction');
+        expect(Obj.testFunction()).to.equal('from object');
+      });
     });
     describe('{ HAS } attributes', () => {
       it('must have them on the class', () => {
