@@ -46,18 +46,18 @@ function executeBuilder(attr) {
 function defineSetter(newValue) {
   if (this.opts.isa) typeValidation(newValue, this.opts.isa);
   if (this.opts.is === 'ro') throw new TypeError(`Can not set to a RO attribute ${this.attr}`);
-  this.klass._jsmoo_[this.attr] = newValue;
+  this.klass._attributes_[this.attr] = newValue;
 }
 
 // 'this' context = { klass: this.prototype, opts, attr }
 function defineGetter() {
-  let value = this.klass._jsmoo_[this.attr];
+  let value = this.klass._attributes_[this.attr];
   if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('default') >= 0) {
     value = executeDefault.bind(this.klass)(this.attr);
-    this.klass._jsmoo_[this.attr] = value;
+    this.klass._attributes_[this.attr] = value;
   } else if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('builder') >= 0) {
     value = executeBuilder.bind(this.klass)(this.attr);
-    this.klass._jsmoo_[this.attr] = value;
+    this.klass._attributes_[this.attr] = value;
   }
   return value;
 }
@@ -69,7 +69,7 @@ function definePredicate() {
     configurable: true,
     enumerable:   true,
     get:          () => {
-      return (this.klass._jsmoo_[this.attr] !== undefined) && (this.klass._jsmoo_[this.attr] !== null);
+      return (this.klass._attributes_[this.attr] !== undefined) && (this.klass._attributes_[this.attr] !== null);
     },
   });
 }
@@ -77,7 +77,7 @@ function definePredicate() {
 // 'this' context = { klass: this.prototype, opts, attr }
 function defineClearer() {
   const clearerName = defineFunctionNameFromAttribute('clear', this.attr);
-  this.klass[clearerName] = () => this.klass[this.attr] = undefined;
+  this.klass[clearerName] = () => this.klass._attributes_[this.attr] = undefined;
 }
 
 function defineAttribute(attr, opts) {
@@ -99,20 +99,26 @@ function defineAttribute(attr, opts) {
   }
   if (isOverride && !this.prototype._jsmoo_._has_[newAttr]) throw new TypeError(`Can't override an unexistent attribute '${newAttr}'`);
   this.prototype._jsmoo_._has_[newAttr] = newOpts;
-  const context = { klass: this.prototype, opts: newOpts, attr: newAttr };
-  if (opts.predicate) definePredicate.bind(context)();
-  if (opts.clearer) defineClearer.bind(context)();
-  Object.defineProperty(this.prototype, newAttr, {
-    configurable: true,
-    enumerable:   true,
-    get:          defineGetter.bind(context),
-    set:          defineSetter.bind(context),
+}
+
+function mountMethods() {
+  Object.keys(this._jsmoo_._has_).forEach(attr => {
+    const opts = this._jsmoo_._has_[attr];
+    const context = { klass: this, opts, attr };
+    if (opts.predicate) definePredicate.bind(context)();
+    if (opts.clearer) defineClearer.bind(context)();
+    Object.defineProperty(this, attr, {
+      configurable: true,
+      enumerable:   true,
+      get:          defineGetter.bind(context),
+      set:          defineSetter.bind(context),
+    });
   });
 }
 
 function requireValidation() {
   Object.keys(this._jsmoo_._has_).forEach(attr => {
-    if (this._jsmoo_._has_[attr].required && (this._jsmoo_[attr] === undefined || this._jsmoo_[attr] === null)) {
+    if (this._jsmoo_._has_[attr].required && (this._attributes_[attr] === undefined || this._attributes_[attr] === null)) {
       throw new TypeError(`The attribute '${attr}' is required`);
     }
   });
@@ -120,7 +126,7 @@ function requireValidation() {
 
 function has(attrs) {
   if (!this.prototype._jsmoo_) this.prototype._jsmoo_ = { _has_: {} };
-  Object.keys(attrs).forEach(attr => defineAttribute.bind(this, attr, attrs[attr])());
+  Object.keys(attrs).forEach(attr => defineAttribute.bind(this)(attr, attrs[attr]));
 }
 
 export default has;
@@ -130,3 +136,4 @@ export { requireValidation };
 export { typeValidation };
 export { executeDefault };
 export { executeBuilder };
+export { mountMethods };
