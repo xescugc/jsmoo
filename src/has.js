@@ -11,7 +11,7 @@ function typeValidation(attr, value, expectedType) {
   if (Array.isArray(value)) foundType = 'array';
   if (value === null) foundType = 'null';
   if ((value === null || value === undefined) || (foundType !== expectedType && value.constructor.name !== expectedType)) {
-    throw new TypeError(`Invalid type for the attribute name, it must be '${expectedType}' found '${foundType}'`);
+    throw new TypeError(`Invalid type for the attribute ${attr}, it must be '${expectedType}' found '${foundType}'`);
   }
   return true;
 }
