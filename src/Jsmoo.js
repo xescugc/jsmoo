@@ -3,7 +3,7 @@ import withRoles from './with';
 
 function initializeAttribute(attr, value) {
   if (!this._jsmoo_) throw new TypeError(`The attribute ${attr} is not defined`);
-  if (this._jsmoo_._has_[attr].isa) typeValidation(value, this._jsmoo_._has_[attr].isa);
+  if (this._jsmoo_._has_[attr].isa) typeValidation(attr, value, this._jsmoo_._has_[attr].isa);
   if (this._jsmoo_._has_[attr].trigger) executeTrigger.bind(this)(attr, value, undefined);
   this._attributes_[attr] = value;
 }

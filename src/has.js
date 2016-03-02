@@ -5,7 +5,7 @@ function defineFunctionNameFromAttribute(prefix, attr) {
   return `${prefix}${attr[0].toUpperCase()}${attr.substring(1)}`;
 }
 
-function typeValidation(value, expectedType) {
+function typeValidation(attr, value, expectedType) {
   let foundType = typeof value;
   if (typeof expectedType === 'function') return expectedType(value);
   if (Array.isArray(value)) foundType = 'array';
@@ -20,7 +20,7 @@ function executeDefault(attr) {
   const defaultValue = this._jsmoo_._has_[attr].default;
   const value = typeof defaultValue === 'function' ? defaultValue.bind(this)() : defaultValue;
   if (this._jsmoo_._has_[attr].isa) {
-    typeValidation(value, this._jsmoo_._has_[attr].isa);
+    typeValidation(attr, value, this._jsmoo_._has_[attr].isa);
   }
   return value;
 }
@@ -37,7 +37,7 @@ function executeBuilder(attr) {
     value = this[builderFunction]();
   }
   if (this._jsmoo_._has_[attr].isa) {
-    typeValidation(value, this._jsmoo_._has_[attr].isa);
+    typeValidation(attr, value, this._jsmoo_._has_[attr].isa);
   }
   return value;
 }
@@ -54,7 +54,7 @@ function executeTrigger(attr, newValue, oldValue) {
 
 // 'this' context = { klass: this.prototype, opts, attr }
 function defineSetter(newValue) {
-  if (this.opts.isa) typeValidation(newValue, this.opts.isa);
+  if (this.opts.isa) typeValidation(this.attr, newValue, this.opts.isa);
   if (this.opts.is === 'ro') throw new TypeError(`Can not set to a RO attribute ${this.attr}`);
   if (this.opts.trigger) executeTrigger.bind(this.klass)(this.attr, newValue, this.klass._attributes_[this.attr]);
   this.klass._attributes_[this.attr] = newValue;
