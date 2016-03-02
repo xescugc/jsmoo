@@ -42,10 +42,21 @@ function executeBuilder(attr) {
   return value;
 }
 
+function executeTrigger(attr, newValue, oldValue) {
+  const triggerValue = this._jsmoo_._has_[attr].trigger;
+  if (typeof triggerValue === 'function') {
+    triggerValue.bind(this)(newValue, oldValue);
+  } else {
+    const triggerFunction = defineFunctionNameFromAttribute('trigger', attr);
+    this[triggerFunction](newValue, oldValue);
+  }
+}
+
 // 'this' context = { klass: this.prototype, opts, attr }
 function defineSetter(newValue) {
   if (this.opts.isa) typeValidation(newValue, this.opts.isa);
   if (this.opts.is === 'ro') throw new TypeError(`Can not set to a RO attribute ${this.attr}`);
+  if (this.opts.trigger) executeTrigger.bind(this.klass)(this.attr, newValue, this.klass._attributes_[this.attr]);
   this.klass._attributes_[this.attr] = newValue;
 }
 
@@ -136,4 +147,5 @@ export { requireValidation };
 export { typeValidation };
 export { executeDefault };
 export { executeBuilder };
+export { executeTrigger };
 export { mountMethods };

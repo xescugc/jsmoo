@@ -82,4 +82,5 @@ describe('Test HAS with { ISA } option', () => {
     }, 2, undefined, 3, { error: 'Custom Error' });
   });
   it('of type DATE');
+  it('of enum');
 });

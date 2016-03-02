@@ -67,7 +67,6 @@ describe("Test 'has'", () => {
     });
   });
   it('with { COERCE } option');
-  it('with { TRIGGER } option');
   it('with { READER } option');
   it('with { WRITTER } option');
 });

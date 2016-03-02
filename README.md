@@ -25,6 +25,7 @@
       * [predicate](#predicate)
       * [clearer](#clearer)
       * [builder](#builder)
+      * [trigger](#trigger)
     * [with](#with)
   * [Role](#role)
 
@@ -333,6 +334,23 @@ __Example:__
   Client.prototype.buildAgeForUser = function() {}
   Client.prototype.buildName = function() {}
 
+```
+
+### trigger
+
+It creates a handle that will trigger after the attribute is setted. This includes the constructor but not `default` ond `builder`. This handle will recieve the `oldValue` and the `newValue`. It can be defined with a boolean value, in which case would call a function with the name of the attribute like this `trigger${attributeName}` (if is starts with _ then `_trigger${attributeName}`. Or it can be defined with a funciton.
+
+```js
+  class Client extends Jsmoo {}
+
+  Client.has({
+    name:     { is: 'rw', trigger: 1 },
+    age:      { is: 'rw', trigger: triggerForAge },
+    surname:  { is: 'rw', trigger: trigger(newValue, oldValue) {} },
+  });
+
+  Client.prototype.triggerName = function (newValue, oldValue) { }
+  function triggerForAge (newValue, oldValue) { }
 ```
 
 ## with
