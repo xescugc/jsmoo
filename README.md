@@ -26,6 +26,7 @@
       * [clearer](#clearer)
       * [builder](#builder)
       * [trigger](#trigger)
+      * [coerce](#coerce)
     * [with](#with)
   * [Role](#role)
 
@@ -340,6 +341,8 @@ __Example:__
 
 It creates a handle that will trigger after the attribute is setted. This includes the constructor but not `default` ond `builder`. This handle will recieve the `oldValue` and the `newValue`. It can be defined with a boolean value, in which case would call a function with the name of the attribute like this `trigger${attributeName}` (if is starts with _ then `_trigger${attributeName}`. Or it can be defined with a funciton.
 
+__Example:__
+
 ```js
   class Client extends Jsmoo {}
 
@@ -351,6 +354,34 @@ It creates a handle that will trigger after the attribute is setted. This includ
 
   Client.prototype.triggerName = function (newValue, oldValue) { }
   function triggerForAge (newValue, oldValue) { }
+```
+
+### coerce
+
+It takes a function and coerce the attribute
+
+__Example:__
+
+```js
+  class Client extends Jsmoo {}
+
+  function stringToNumber(value) {
+      if (typeof value === 'string') {
+        return value * 1;
+      }
+      return value
+  }
+
+  Client.has({
+    age:    { is: 'rw', isa: 'number', coerce: stringToNumber },
+  });
+
+  const client = new Client({ age: '25' });
+  client.age
+  # 18
+  typeof client.age
+  # number
+
 ```
 
 ## with

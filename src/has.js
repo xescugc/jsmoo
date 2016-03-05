@@ -16,9 +16,20 @@ function typeValidation(attr, value, expectedType) {
   return true;
 }
 
+function executeCoerce(attr, value) {
+  const coerceValue = this._jsmoo_._has_[attr].coerce;
+  const newValue = value || this._attributes_[attr];
+  if (typeof coerceValue === 'function') {
+    return coerceValue(newValue);
+  }
+  throw new TypeError(`Invalid type of Coerce on '${attr}'`);
+}
+
+
 function executeDefault(attr) {
   const defaultValue = this._jsmoo_._has_[attr].default;
-  const value = typeof defaultValue === 'function' ? defaultValue.bind(this)() : defaultValue;
+  let value = typeof defaultValue === 'function' ? defaultValue.bind(this)() : defaultValue;
+  if (this._jsmoo_._has_[attr].coerce) value = executeCoerce.bind(this)(attr, value);
   if (this._jsmoo_._has_[attr].isa) {
     typeValidation(attr, value, this._jsmoo_._has_[attr].isa);
   }
@@ -36,6 +47,7 @@ function executeBuilder(attr) {
     if (!this[builderFunction]) throw new TypeError(`The builder function '${builderFunction}' is not defined`);
     value = this[builderFunction]();
   }
+  if (this._jsmoo_._has_[attr].coerce) value = executeCoerce.bind(this)(attr, value);
   if (this._jsmoo_._has_[attr].isa) {
     typeValidation(attr, value, this._jsmoo_._has_[attr].isa);
   }
@@ -53,7 +65,9 @@ function executeTrigger(attr, newValue, oldValue) {
 }
 
 // 'this' context = { klass: this.prototype, opts, attr }
-function defineSetter(newValue) {
+function defineSetter(value) {
+  let newValue = value;
+  if (this.opts.coerce) newValue = executeCoerce.bind(this.klass)(this.attr, newValue);
   if (this.opts.isa) typeValidation(this.attr, newValue, this.opts.isa);
   if (this.opts.is === 'ro') throw new TypeError(`Can not set to a RO attribute ${this.attr}`);
   if (this.opts.trigger) executeTrigger.bind(this.klass)(this.attr, newValue, this.klass._attributes_[this.attr]);
@@ -65,9 +79,11 @@ function defineGetter() {
   let value = this.klass._attributes_[this.attr];
   if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('default') >= 0) {
     value = executeDefault.bind(this.klass)(this.attr);
+    if (this.opts.coerce) value = executeCoerce.bind(this.klass)(this.attr);
     this.klass._attributes_[this.attr] = value;
   } else if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('builder') >= 0) {
     value = executeBuilder.bind(this.klass)(this.attr);
+    if (this.opts.coerce) value = executeCoerce.bind(this.klass)(this.attr);
     this.klass._attributes_[this.attr] = value;
   }
   return value;
@@ -149,3 +165,4 @@ export { executeDefault };
 export { executeBuilder };
 export { executeTrigger };
 export { mountMethods };
+export { executeCoerce };

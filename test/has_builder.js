@@ -83,3 +83,4 @@ describe('Test HAS with { BUILDER } option', () => {
   });
 });
 it('test for builder and default present');
+it('test builder with function');

@@ -98,7 +98,6 @@ describe('Test HAS with { TRIGGER } option', () => {
       } } });
       const obj = new Obj();
       expect(obj.name).to.equal('name');
-      console.log(expectedNew, expectedOld);
       expect(expectedNew).to.equal(undefined);
       expect(expectedOld).to.equal(undefined);
     });
@@ -112,7 +111,6 @@ describe('Test HAS with { TRIGGER } option', () => {
       } } });
       const obj = new Obj();
       expect(obj.name).to.equal('name');
-      console.log(expectedNew, expectedOld);
       expect(expectedNew).to.equal(undefined);
       expect(expectedOld).to.equal(undefined);
     });
