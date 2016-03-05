@@ -1,3 +1,5 @@
+function hasOption(attr, option) { return Object.keys(this._jsmoo_._has_[attr]).indexOf(option) >= 0; }
+
 function defineFunctionNameFromAttribute(prefix, attr) {
   if (attr.match(/^_/)) {
     return `_${prefix}${attr[1].toUpperCase()}${attr.substring(2)}`;
@@ -5,7 +7,9 @@ function defineFunctionNameFromAttribute(prefix, attr) {
   return `${prefix}${attr[0].toUpperCase()}${attr.substring(1)}`;
 }
 
-function typeValidation(attr, value, expectedType) {
+function typeValidation(attr, value) {
+  if (!hasOption.bind(this)(attr, 'isa')) return true;
+  const expectedType = this._jsmoo_._has_[attr].isa;
   let foundType = typeof value;
   if (typeof expectedType === 'function') return expectedType(value);
   if (Array.isArray(value)) foundType = 'array';
@@ -17,22 +21,21 @@ function typeValidation(attr, value, expectedType) {
 }
 
 function executeCoerce(attr, value) {
+  // TODO: Check this validation
+  const newValue = value === undefined ? this._attributes_[attr] : value;
+  if (!hasOption.bind(this)(attr, 'coerce')) return newValue;
   const coerceValue = this._jsmoo_._has_[attr].coerce;
-  const newValue = value || this._attributes_[attr];
   if (typeof coerceValue === 'function') {
     return coerceValue(newValue);
   }
   throw new TypeError(`Invalid type of Coerce on '${attr}'`);
 }
 
-
 function executeDefault(attr) {
   const defaultValue = this._jsmoo_._has_[attr].default;
   let value = typeof defaultValue === 'function' ? defaultValue.bind(this)() : defaultValue;
-  if (this._jsmoo_._has_[attr].coerce) value = executeCoerce.bind(this)(attr, value);
-  if (this._jsmoo_._has_[attr].isa) {
-    typeValidation(attr, value, this._jsmoo_._has_[attr].isa);
-  }
+  value = executeCoerce.bind(this)(attr, value);
+  typeValidation.bind(this)(attr, value);
   return value;
 }
 
@@ -47,14 +50,13 @@ function executeBuilder(attr) {
     if (!this[builderFunction]) throw new TypeError(`The builder function '${builderFunction}' is not defined`);
     value = this[builderFunction]();
   }
-  if (this._jsmoo_._has_[attr].coerce) value = executeCoerce.bind(this)(attr, value);
-  if (this._jsmoo_._has_[attr].isa) {
-    typeValidation(attr, value, this._jsmoo_._has_[attr].isa);
-  }
+  value = executeCoerce.bind(this)(attr, value);
+  typeValidation.bind(this)(attr, value);
   return value;
 }
 
 function executeTrigger(attr, newValue, oldValue) {
+  if (!hasOption.bind(this)(attr, 'trigger')) return true;
   const triggerValue = this._jsmoo_._has_[attr].trigger;
   if (typeof triggerValue === 'function') {
     triggerValue.bind(this)(newValue, oldValue);
@@ -68,20 +70,20 @@ function executeTrigger(attr, newValue, oldValue) {
 function defineSetter(value) {
   let newValue = value;
   if (this.opts.coerce) newValue = executeCoerce.bind(this.klass)(this.attr, newValue);
-  if (this.opts.isa) typeValidation(this.attr, newValue, this.opts.isa);
+  typeValidation.bind(this.klass)(this.attr, newValue);
   if (this.opts.is === 'ro') throw new TypeError(`Can not set to a RO attribute ${this.attr}`);
-  if (this.opts.trigger) executeTrigger.bind(this.klass)(this.attr, newValue, this.klass._attributes_[this.attr]);
+  executeTrigger.bind(this.klass)(this.attr, newValue, this.klass._attributes_[this.attr]);
   this.klass._attributes_[this.attr] = newValue;
 }
 
 // 'this' context = { klass: this.prototype, opts, attr }
 function defineGetter() {
   let value = this.klass._attributes_[this.attr];
-  if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('default') >= 0) {
+  if (value === undefined && this.opts.lazy && hasOption.bind(this.klass)(this.attr, 'default')) {
     value = executeDefault.bind(this.klass)(this.attr);
     if (this.opts.coerce) value = executeCoerce.bind(this.klass)(this.attr);
     this.klass._attributes_[this.attr] = value;
-  } else if (value === undefined && this.opts.lazy && Object.keys(this.opts).indexOf('builder') >= 0) {
+  } else if (value === undefined && this.opts.lazy && hasOption.bind(this.klass)(this.attr, 'builder')) {
     value = executeBuilder.bind(this.klass)(this.attr);
     if (this.opts.coerce) value = executeCoerce.bind(this.klass)(this.attr);
     this.klass._attributes_[this.attr] = value;
@@ -166,3 +168,4 @@ export { executeBuilder };
 export { executeTrigger };
 export { mountMethods };
 export { executeCoerce };
+export { hasOption };
