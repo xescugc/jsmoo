@@ -16,6 +16,7 @@
   * [API](#api)
     * [beforeInitialize](#beforeinitialize)
     * [afterInitialize](#afterinitialize)
+    * [before](#before)
     * [has](#has)
       * [is](#is)
       * [isa](#isa)
@@ -100,7 +101,7 @@ The example without Jsmoo it's not the same of the one with Jsmoo, because to wr
 The module itself exports more than one module:
 
 ``` js
-  import Jsmoo, { Role } from 'jsmoo';
+  import Jsmoo, { Role, before } from 'jsmoo';
 ```
 
 The way the Classes are initialized is with a plain Object, where the keys are the attributes defined on the `has`.
@@ -148,6 +149,36 @@ _Example:_
 
   const file = new File({filename: 'photo.jpg'});
   //  => 'photo.jpg'
+```
+
+## before
+
+The `before` function is called before the specified function, the result of it is totally ignored, but you can throw an error to stop it if you need too.
+
+``` js
+  import Jsmoo, { before } from 'jsmoo';
+
+  class Client extends from Jsmoo {
+    save() {
+      // Save the client (fake)
+      db.insert(this);
+    }
+  }
+
+  Client.has({
+    name:     { is: 'rw', isa: 'string', predicate: 1},
+    surname:  { is: 'rw', isa: 'string', predicate: 1},
+  });
+
+  before(Client.prototype, 'save', function() {
+    if (this.hasSurname && !this.hasName) {
+      throw new TypeError('Need name if surname');
+    }
+  });
+
+  const client = new Client({ surname: 'Grillo' });
+
+  client.save();
 ```
 
 ## has
