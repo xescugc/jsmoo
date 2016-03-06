@@ -101,7 +101,7 @@ The example without Jsmoo it's not the same of the one with Jsmoo, because to wr
 The module itself exports more than one module:
 
 ``` js
-  import Jsmoo, { Role, before } from 'jsmoo';
+  import Jsmoo, { Role, before, after } from 'jsmoo';
 ```
 
 The way the Classes are initialized is with a plain Object, where the keys are the attributes defined on the `has`.
@@ -174,6 +174,33 @@ The `before` function is called before the specified function, the result of it 
     if (this.hasSurname && !this.hasName) {
       throw new TypeError('Need name if surname');
     }
+  });
+
+  const client = new Client({ surname: 'Grillo' });
+
+  client.save();
+```
+
+## after
+
+The `after` function is called after the specified function, the result of it is totally ignored.
+
+``` js
+  import Jsmoo, { after } from 'jsmoo';
+
+  class Client extends from Jsmoo {
+    save() {
+      // Save the client (fake)
+      db.insert(this);
+    }
+  }
+
+  Client.has({
+    name:     { is: 'rw', isa: 'string' },
+  });
+
+  after(Client.prototype, 'save', function() {
+    Mailer.send(this)
   });
 
   const client = new Client({ surname: 'Grillo' });

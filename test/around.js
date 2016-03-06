@@ -1,5 +1,5 @@
 import { describe, it } from 'mocha';
 
-describe("Test 'around'", () => {
-  it('must have a function around the method|attribute');
+describe("Test 'after'", () => {
+  it('it must be called after the function');
 });

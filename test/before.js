@@ -6,13 +6,14 @@ import { buildObject } from './utils';
 describe("Test 'before'", () => {
   it('it must be called before the function', () => {
     const Obj = buildObject();
-    let funcIn;
+    const order = [];
     Obj.prototype.save = function (name) {
-      funcIn = true;
+      order.push('func');
     };
     let beforeParams;
     before(Obj.prototype, 'save', function (param) {
       beforeParams = param;
+      order.push('before');
     });
 
     const obj = new Obj();
@@ -20,6 +21,6 @@ describe("Test 'before'", () => {
     obj.save('test');
 
     expect(beforeParams).to.equal('test');
-    expect(funcIn).to.be.true; //eslint-disable-line
+    expect(order).to.eql(['before', 'func']);
   });
 });
