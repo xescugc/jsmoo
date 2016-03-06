@@ -17,6 +17,7 @@
     * [beforeInitialize](#beforeinitialize)
     * [afterInitialize](#afterinitialize)
     * [before](#before)
+    * [after](#after)
     * [has](#has)
       * [is](#is)
       * [isa](#isa)
