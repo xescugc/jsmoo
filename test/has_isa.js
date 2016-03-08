@@ -83,4 +83,5 @@ describe('Test HAS with { ISA } option', () => {
   });
   it('of type DATE');
   it('of enum');
+  it('of Maybe');
 });
