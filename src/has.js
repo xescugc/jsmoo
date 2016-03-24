@@ -9,12 +9,19 @@ function defineFunctionNameFromAttribute(prefix, attr) {
 
 function typeValidation(attr, value) {
   if (!hasOption.bind(this)(attr, 'isa')) return true;
-  const expectedType = this._jsmoo_._has_[attr].isa;
-  let foundType = typeof value;
+  let isMaybe = false;
+  let expectedType = this._jsmoo_._has_[attr].isa;
   if (typeof expectedType === 'function') return expectedType(value);
+  let foundType = typeof value;
+  const match = expectedType.match(/Maybe\[(.*)\]/);
+  if (match) {
+    expectedType = match[1];
+    isMaybe = true;
+  }
   if (Array.isArray(value)) foundType = 'array';
   if (value === null) foundType = 'null';
-  if ((value === null || value === undefined) || (foundType !== expectedType && value.constructor.name !== expectedType)) {
+  if ((value === null || value === undefined) && isMaybe) return true;
+  if (((value === null || value === undefined) && !isMaybe) || (foundType !== expectedType && value.constructor.name !== expectedType)) {
     throw new TypeError(`Invalid type for the attribute ${attr}, it must be '${expectedType}' found '${foundType}'`);
   }
   return true;

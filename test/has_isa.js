@@ -81,6 +81,10 @@ describe('Test HAS with { ISA } option', () => {
       if (value % 2 !== 0) throw new TypeError('Custom Error');
     }, 2, undefined, 3, { error: 'Custom Error' });
   });
+  describe('of type MAYBE[type]', () => {
+    makeTypeTest('Maybe[boolean]', undefined, 'string', '', { error: "Invalid type for the attribute name, it must be 'boolean' found 'string'" });
+    makeTypeTest('Maybe[boolean]', true, 'string', '', { error: "Invalid type for the attribute name, it must be 'boolean' found 'string'" });
+  });
   it('of type DATE');
   it('of enum');
   it('of Maybe');
