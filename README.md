@@ -246,9 +246,9 @@ It defines the type of the attribute, it can have the following values:
   * `array` or `Array`
   * `boolean` or `Boolean`
   * `object` or `Object`
+  * `Maybe[type]` validates the type but it wont throw error if it's `undefined` or `null`
   * Your types
   * Custom validations
-
 
 Each of this types is defined as string on the `isa` except for the 'Custom validations' which are functions that validates the type value, to declare a value as invalid you have to throw an error.
 
@@ -268,6 +268,7 @@ __Example:__
     valid:    { is: 'rw', isa: 'boolean'},
     city:     { is: 'rw', isa: 'City' }, // Your types
     even:     { is: 'rw', isa: isEven }, // Your custom validation
+    number:   { is: 'rw', isa: 'Maybe[number]' }, // Can be undefined or null
   });
 
   const city = new City();
