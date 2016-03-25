@@ -172,7 +172,7 @@ The `before` function is called before the specified function, the result of it 
   });
 
   before(Client.prototype, 'save', function() {
-    if (this.hasSurname && !this.hasName) {
+    if (this.hasSurname() && !this.hasName()) {
       throw new TypeError('Need name if surname');
     }
   });
@@ -351,10 +351,10 @@ __Example:__
   });
 
   let obj = new Client({ name: 'value' });
-  obj.hasName
+  obj.hasName()
   // => true
   obj.name = undefined;
-  obj.hasName
+  obj.hasName()
   // => false
 ```
 ### clearer

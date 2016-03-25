@@ -101,13 +101,9 @@ function defineGetter() {
 // 'this' context = { klass: this.prototype, opts, attr }
 function definePredicate() {
   const predicateName = defineFunctionNameFromAttribute('has', this.attr);
-  Object.defineProperty(this.klass, predicateName, {
-    configurable: true,
-    enumerable:   true,
-    get:          () => {
-      return (this.klass._attributes_[this.attr] !== undefined) && (this.klass._attributes_[this.attr] !== null);
-    },
-  });
+  this.klass[predicateName] = () => {
+    return (this.klass._attributes_[this.attr] !== undefined) && (this.klass._attributes_[this.attr] !== null);
+  };
 }
 
 // 'this' context = { klass: this.prototype, opts, attr }
