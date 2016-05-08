@@ -8,7 +8,7 @@ describe("Test 'after'", () => {
     const Obj = buildObject();
     const order = [];
     Obj.prototype.save = function (name) {
-      order.push('func');
+      order.push(`save-${name}`);
     };
     let afterParams;
     after(Obj.prototype, 'save', function (param) {
@@ -21,6 +21,28 @@ describe("Test 'after'", () => {
     obj.save('test');
 
     expect(afterParams).to.equal('test');
-    expect(order).to.eql(['func', 'after']);
+    expect(order).to.eql(['save-test', 'after']);
+  });
+  it('must have the right context', () => {
+    const Obj = buildObject();
+    Obj.has({
+      name: { is: 'rw' },
+    });
+    const order = [];
+    Obj.prototype.save = function (name) {
+      order.push(`save-${name}`);
+    };
+    let afterParams;
+    after(Obj.prototype, 'save', function (param) {
+      afterParams = param;
+      order.push(this.name);
+    });
+
+    const obj = new Obj({ name: 'Pepito' });
+
+    obj.save('test');
+
+    expect(afterParams).to.equal('test');
+    expect(order).to.eql(['save-test', 'Pepito']);
   });
 });

@@ -133,12 +133,14 @@ function defineAttribute(attr, opts) {
   this.prototype._jsmoo_._has_[newAttr] = newOpts;
 }
 
-function mountMethods() {
+function mountGettersSetters() {
   Object.keys(this._jsmoo_._has_).forEach(attr => {
     const opts = this._jsmoo_._has_[attr];
     const context = { klass: this, opts, attr };
+
     if (opts.predicate) definePredicate.bind(context)();
     if (opts.clearer) defineClearer.bind(context)();
+
     Object.defineProperty(this, attr, {
       configurable: true,
       enumerable:   true,
@@ -158,7 +160,9 @@ function requireValidation() {
 
 function has(attrs) {
   if (!this.prototype._jsmoo_) this.prototype._jsmoo_ = { _has_: {} };
+  if (!this.prototype._attributes_) this.prototype._attributes_ = {};
   Object.keys(attrs).forEach(attr => defineAttribute.bind(this)(attr, attrs[attr]));
+  mountGettersSetters.bind(this.prototype)();
 }
 
 export default has;
@@ -169,6 +173,5 @@ export { typeValidation };
 export { executeDefault };
 export { executeBuilder };
 export { executeTrigger };
-export { mountMethods };
 export { executeCoerce };
 export { hasOption };

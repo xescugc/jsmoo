@@ -1,4 +1,4 @@
-import has, { hasOption, mountMethods, typeValidation, executeCoerce, executeTrigger, requireValidation, executeDefault, executeBuilder } from './has';
+import has, { hasOption, typeValidation, executeCoerce, executeTrigger, requireValidation, executeDefault, executeBuilder } from './has';
 import withRoles from './with';
 
 function initializeAttribute(attr, value) {
@@ -14,8 +14,6 @@ function initializeAttribute(attr, value) {
 class Jsmoo {
   constructor(attrs = {}) {
     if (!this._jsmoo_) return;
-    if (!this._attributes_) this._attributes_ = {};
-    mountMethods.bind(this)();
     let newAttrs = attrs;
     if (typeof this.beforeInitialize === 'function') newAttrs = this.beforeInitialize(attrs);
     const hasAttr = Object.keys(this._jsmoo_._has_);
