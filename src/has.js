@@ -109,7 +109,7 @@ function definePredicate() {
 // 'this' context = { klass: this.prototype, opts, attr }
 function defineClearer() {
   const clearerName = defineFunctionNameFromAttribute('clear', this.attr);
-  this.klass[clearerName] = () => this.klass._attributes_[this.attr] = undefined;
+  this.klass[clearerName] = () => delete this.klass._attributes_[this.attr];
 }
 
 function defineAttribute(attr, opts) {
