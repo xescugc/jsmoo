@@ -1,4 +1,10 @@
 function hasOption(attr, option) { return Object.keys(this._jsmoo_._has_[attr]).indexOf(option) >= 0; }
+function hasOptionsFor(attr) { return this._jsmoo_._has_[attr]; }
+function getOption(attr, option) { return this._jsmoo_._has_[attr][option]; }
+function setOption(attr, value) { this._jsmoo_._has_[attr] = value; }
+
+function getAttribute(attr) { return this._attributes_[attr]; }
+function setAttribute(attr, value) { this._attributes_[attr] = value; }
 
 function defineFunctionNameFromAttribute(prefix, attr) {
   if (attr.match(/^_/)) {
@@ -10,7 +16,7 @@ function defineFunctionNameFromAttribute(prefix, attr) {
 function typeValidation(attr, value) {
   if (!hasOption.bind(this)(attr, 'isa')) return true;
   let isMaybe = false;
-  let expectedType = this._jsmoo_._has_[attr].isa;
+  let expectedType = getOption.bind(this)(attr, 'isa');
   if (typeof expectedType === 'function') return expectedType(value);
   let foundType = typeof value;
   const match = expectedType.match(/Maybe\[(.*)\]/);
@@ -28,18 +34,17 @@ function typeValidation(attr, value) {
 }
 
 function executeCoerce(attr, value) {
+  if (!hasOption.bind(this)(attr, 'coerce')) return value;
   // TODO: Check this validation
-  const newValue = value === undefined ? this._attributes_[attr] : value;
-  if (!hasOption.bind(this)(attr, 'coerce')) return newValue;
-  const coerceValue = this._jsmoo_._has_[attr].coerce;
-  if (typeof coerceValue === 'function') {
-    return coerceValue(newValue);
-  }
-  throw new TypeError(`Invalid type of Coerce on '${attr}'`);
+  //const newValue = value === undefined ? getAttribute.bind(this)(attr) : value;
+  const coerceValue = getOption.bind(this)(attr, 'coerce');
+  if (typeof coerceValue !== 'function') throw new TypeError(`Invalid type of Coerce on '${attr}'`);
+
+  return coerceValue(value);
 }
 
 function executeDefault(attr) {
-  const defaultValue = this._jsmoo_._has_[attr].default;
+  const defaultValue = getOption.bind(this)(attr, 'default');
   let value = typeof defaultValue === 'function' ? defaultValue.bind(this)() : defaultValue;
   value = executeCoerce.bind(this)(attr, value);
   typeValidation.bind(this)(attr, value);
@@ -47,7 +52,7 @@ function executeDefault(attr) {
 }
 
 function executeBuilder(attr) {
-  const defaultValue = this._jsmoo_._has_[attr].builder;
+  const defaultValue = getOption.bind(this)(attr, 'builder');
   let value;
   if (typeof defaultValue === 'string') {
     if (!this[defaultValue]) throw new TypeError(`The builder function '${defaultValue}' is not defined`);
@@ -64,7 +69,7 @@ function executeBuilder(attr) {
 
 function executeTrigger(attr, newValue, oldValue) {
   if (!hasOption.bind(this)(attr, 'trigger')) return true;
-  const triggerValue = this._jsmoo_._has_[attr].trigger;
+  const triggerValue = getOption.bind(this)(attr, 'trigger');
   if (typeof triggerValue === 'function') {
     triggerValue.bind(this)(newValue, oldValue);
   } else {
@@ -74,85 +79,83 @@ function executeTrigger(attr, newValue, oldValue) {
 }
 
 // 'this' context = { klass: this.prototype, opts, attr }
-function defineSetter(value) {
+function defineSetter(attr, value) {
   let newValue = value;
-  if (this.opts.coerce) newValue = executeCoerce.bind(this.klass)(this.attr, newValue);
-  typeValidation.bind(this.klass)(this.attr, newValue);
-  if (this.opts.is === 'ro') throw new TypeError(`Can not set to a RO attribute ${this.attr}`);
-  executeTrigger.bind(this.klass)(this.attr, newValue, this.klass._attributes_[this.attr]);
-  this.klass._attributes_[this.attr] = newValue;
+  newValue = executeCoerce.bind(this)(attr, newValue);
+  typeValidation.bind(this)(attr, newValue);
+  if (getOption.bind(this)(attr, 'is') === 'ro') throw new TypeError(`Can not set to a RO attribute ${attr}`);
+  executeTrigger.bind(this)(attr, newValue, getAttribute.bind(this)(attr));
+  setAttribute.bind(this)(attr, newValue);
 }
 
-// 'this' context = { klass: this.prototype, opts, attr }
-function defineGetter() {
-  let value = this.klass._attributes_[this.attr];
-  if (value === undefined && this.opts.lazy && hasOption.bind(this.klass)(this.attr, 'default')) {
-    value = executeDefault.bind(this.klass)(this.attr);
-    if (this.opts.coerce) value = executeCoerce.bind(this.klass)(this.attr);
-    this.klass._attributes_[this.attr] = value;
-  } else if (value === undefined && this.opts.lazy && hasOption.bind(this.klass)(this.attr, 'builder')) {
-    value = executeBuilder.bind(this.klass)(this.attr);
-    if (this.opts.coerce) value = executeCoerce.bind(this.klass)(this.attr);
-    this.klass._attributes_[this.attr] = value;
+function defineGetter(attr) {
+  let value = getAttribute.bind(this)(attr);
+  if (value === undefined && hasOption.bind(this)(attr, 'lazy') && hasOption.bind(this)(attr, 'default')) {
+    value = executeDefault.bind(this)(attr);
+    value = executeCoerce.bind(this)(attr, value);
+    setAttribute.bind(this)(attr, value);
+  } else if (value === undefined && hasOption.bind(this)(attr, 'lazy') && hasOption.bind(this)(attr, 'builder')) {
+    value = executeBuilder.bind(this)(attr);
+    value = executeCoerce.bind(this)(attr, value);
+    setAttribute.bind(this)(attr, value);
   }
   return value;
 }
 
-// 'this' context = { klass: this.prototype, opts, attr }
-function definePredicate() {
-  const predicateName = defineFunctionNameFromAttribute('has', this.attr);
-  this.klass[predicateName] = () => {
-    return (this.klass._attributes_[this.attr] !== undefined) && (this.klass._attributes_[this.attr] !== null);
+function definePredicate(attr) {
+  if (!hasOption.bind(this)(attr, 'predicate')) return;
+  const predicateName = defineFunctionNameFromAttribute('has', attr);
+  this[predicateName] = () => {
+    const attributeValue = getAttribute.bind(this)(attr);
+    console.log(attributeValue);
+    return (attributeValue !== undefined) && (attributeValue !== null);
   };
 }
 
-// 'this' context = { klass: this.prototype, opts, attr }
-function defineClearer() {
-  const clearerName = defineFunctionNameFromAttribute('clear', this.attr);
-  this.klass[clearerName] = () => delete this.klass._attributes_[this.attr];
+function defineClearer(attr) {
+  if (!hasOption.bind(this)(attr, 'clearer')) return;
+  const clearerName = defineFunctionNameFromAttribute('clear', attr);
+  this[clearerName] = () => delete this._attributes_[attr];
 }
 
 function defineAttribute(attr, opts) {
-  if (this.prototype._jsmoo_._has_[attr]) return;
+  if (hasOptionsFor.bind(this.prototype)(attr)) return;
   let newAttr = attr;
   let newOpts = opts;
   const isOverride = !!newAttr.match(/^\+/);
   if (isOverride) newAttr = attr.replace(/^\+/, '');
 
   if (!isOverride && (!newOpts || !newOpts.is)) throw new TypeError("'is' key is required");
-  if (isOverride && this.prototype._jsmoo_._has_[newAttr]) {
+  if (isOverride && hasOptionsFor.bind(this.prototype)(newAttr)) {
     // TODO: Remove the old property?
-    const beforeHas = this.prototype._jsmoo_._has_[newAttr];
+    const beforeHas = hasOptionsFor.bind(this.prototype)(newAttr);
     newOpts = Object.assign({}, beforeHas, opts);
   }
   if (Object.getPrototypeOf(this).name === 'Role') {
-    this.prototype._jsmoo_._has_[attr] = opts;
+    setOption.bind(this.prototype)(attr, opts);
     return;
   }
-  if (isOverride && !this.prototype._jsmoo_._has_[newAttr]) throw new TypeError(`Can't override an unexistent attribute '${newAttr}'`);
-  this.prototype._jsmoo_._has_[newAttr] = newOpts;
+  if (isOverride && !hasOptionsFor.bind(this.prototype)(newAttr)) throw new TypeError(`Can't override an unexistent attribute '${newAttr}'`);
+  setOption.bind(this.prototype)(newAttr, newOpts);
 }
 
 function mountGettersSetters() {
   Object.keys(this._jsmoo_._has_).forEach(attr => {
-    const opts = this._jsmoo_._has_[attr];
-    const context = { klass: this, opts, attr };
-
-    if (opts.predicate) definePredicate.bind(context)();
-    if (opts.clearer) defineClearer.bind(context)();
+    definePredicate.bind(this)(attr);
+    defineClearer.bind(this)(attr);
 
     Object.defineProperty(this, attr, {
       configurable: true,
       enumerable:   true,
-      get:          defineGetter.bind(context),
-      set:          defineSetter.bind(context),
+      get:          defineGetter.bind(this, attr),
+      set:          defineSetter.bind(this, attr),
     });
   });
 }
 
 function requireValidation() {
   Object.keys(this._jsmoo_._has_).forEach(attr => {
-    if (this._jsmoo_._has_[attr].required && (this._attributes_[attr] === undefined || this._attributes_[attr] === null)) {
+    if (getOption.bind(this)(attr, 'required') && (getAttribute.bind(this)(attr) === undefined || getAttribute.bind(this)(attr) === null)) {
       throw new TypeError(`The attribute '${attr}' is required`);
     }
   });

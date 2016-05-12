@@ -21,12 +21,13 @@ class Jsmoo {
     initializedAttr.forEach(attr => initializeAttribute.bind(this)(attr, newAttrs[attr]));
     requireValidation.bind(this)();
     hasAttr.filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
+      let value;
       if (hasOption.bind(this)(attr, 'default') && !this._jsmoo_._has_[attr].lazy) {
-        this._attributes_[attr] = executeDefault.bind(this)(attr);
+        value = executeDefault.bind(this)(attr);
       } else if (hasOption.bind(this)(attr, 'builder') && !this._jsmoo_._has_[attr].lazy) {
-        this._attributes_[attr] = executeBuilder.bind(this)(attr);
+        value = executeBuilder.bind(this)(attr);
       }
-      this._attributes_[attr] = executeCoerce.bind(this)(attr);
+      this._attributes_[attr] = executeCoerce.bind(this)(attr, value);
     });
     if (typeof this.afterInitialize === 'function') this.afterInitialize();
   }
