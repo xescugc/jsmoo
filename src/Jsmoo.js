@@ -1,4 +1,4 @@
-import has, { hasOption, typeValidation, executeCoerce, executeTrigger, requireValidation, executeDefault, executeBuilder } from './has';
+import has, { getAllOptions, setAttribute, hasOption, typeValidation, executeCoerce, executeTrigger, requireValidation, executeDefault, executeBuilder } from './has';
 import withRoles from './with';
 
 function initializeAttribute(attr, value) {
@@ -7,7 +7,7 @@ function initializeAttribute(attr, value) {
   newValue = executeCoerce.bind(this)(attr, newValue);
   typeValidation.bind(this)(attr, newValue);
   executeTrigger.bind(this)(attr, newValue, undefined);
-  this._attributes_[attr] = newValue;
+  setAttribute.bind(this)(attr, newValue);
 }
 
 
@@ -16,18 +16,19 @@ class Jsmoo {
     if (!this._jsmoo_) return;
     let newAttrs = attrs;
     if (typeof this.beforeInitialize === 'function') newAttrs = this.beforeInitialize(attrs);
-    const hasAttr = Object.keys(this._jsmoo_._has_);
+    const hasAttr = Object.keys(getAllOptions.bind(this)());
     const initializedAttr = Object.keys(newAttrs).filter(k => hasAttr.indexOf(k) >= 0 ? true : false);
     initializedAttr.forEach(attr => initializeAttribute.bind(this)(attr, newAttrs[attr]));
     requireValidation.bind(this)();
     hasAttr.filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
       let value;
-      if (hasOption.bind(this)(attr, 'default') && !this._jsmoo_._has_[attr].lazy) {
+      if (hasOption.bind(this)(attr, 'default') && !hasOption.bind(this)(attr, 'lazy')) {
         value = executeDefault.bind(this)(attr);
-      } else if (hasOption.bind(this)(attr, 'builder') && !this._jsmoo_._has_[attr].lazy) {
+      } else if (hasOption.bind(this)(attr, 'builder') && !hasOption.bind(this)(attr, 'lazy')) {
         value = executeBuilder.bind(this)(attr);
       }
-      this._attributes_[attr] = executeCoerce.bind(this)(attr, value);
+      value = executeCoerce.bind(this)(attr, value);
+      setAttribute.bind(this)(attr, value);
     });
     if (typeof this.afterInitialize === 'function') this.afterInitialize();
   }

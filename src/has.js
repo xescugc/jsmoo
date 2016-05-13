@@ -2,9 +2,11 @@ function hasOption(attr, option) { return Object.keys(this._jsmoo_._has_[attr]).
 function hasOptionsFor(attr) { return this._jsmoo_._has_[attr]; }
 function getOption(attr, option) { return this._jsmoo_._has_[attr][option]; }
 function setOption(attr, value) { this._jsmoo_._has_[attr] = value; }
+function getAllOptions() { return this._jsmoo_._has_; }
 
-function getAttribute(attr) { return this._attributes_[attr]; }
-function setAttribute(attr, value) { this._attributes_[attr] = value; }
+function getAttribute(attr) { return this._jsmoo_._attributes_[attr]; }
+function setAttribute(attr, value) { this._jsmoo_._attributes_[attr] = value; }
+function deleteAttribute(attr) { delete this._jsmoo_._attributes_[attr]; }
 
 function defineFunctionNameFromAttribute(prefix, attr) {
   if (attr.match(/^_/)) {
@@ -35,8 +37,6 @@ function typeValidation(attr, value) {
 
 function executeCoerce(attr, value) {
   if (!hasOption.bind(this)(attr, 'coerce')) return value;
-  // TODO: Check this validation
-  //const newValue = value === undefined ? getAttribute.bind(this)(attr) : value;
   const coerceValue = getOption.bind(this)(attr, 'coerce');
   if (typeof coerceValue !== 'function') throw new TypeError(`Invalid type of Coerce on '${attr}'`);
 
@@ -78,7 +78,6 @@ function executeTrigger(attr, newValue, oldValue) {
   }
 }
 
-// 'this' context = { klass: this.prototype, opts, attr }
 function defineSetter(attr, value) {
   let newValue = value;
   newValue = executeCoerce.bind(this)(attr, newValue);
@@ -115,7 +114,7 @@ function definePredicate(attr) {
 function defineClearer(attr) {
   if (!hasOption.bind(this)(attr, 'clearer')) return;
   const clearerName = defineFunctionNameFromAttribute('clear', attr);
-  this[clearerName] = () => delete this._attributes_[attr];
+  this[clearerName] = deleteAttribute.bind(this, attr);
 }
 
 function defineAttribute(attr, opts) {
@@ -140,7 +139,7 @@ function defineAttribute(attr, opts) {
 }
 
 function mountGettersSetters() {
-  Object.keys(this._jsmoo_._has_).forEach(attr => {
+  Object.keys(getAllOptions.bind(this)()).forEach(attr => {
     definePredicate.bind(this)(attr);
     defineClearer.bind(this)(attr);
 
@@ -154,7 +153,7 @@ function mountGettersSetters() {
 }
 
 function requireValidation() {
-  Object.keys(this._jsmoo_._has_).forEach(attr => {
+  Object.keys(getAllOptions.bind(this)()).forEach(attr => {
     if (getOption.bind(this)(attr, 'required') && (getAttribute.bind(this)(attr) === undefined || getAttribute.bind(this)(attr) === null)) {
       throw new TypeError(`The attribute '${attr}' is required`);
     }
@@ -162,15 +161,13 @@ function requireValidation() {
 }
 
 function has(attrs) {
-  if (!this.prototype._jsmoo_) this.prototype._jsmoo_ = { _has_: {} };
-  if (!this.prototype._attributes_) this.prototype._attributes_ = {};
+  if (!this.prototype._jsmoo_) this.prototype._jsmoo_ = { _has_: {}, _attributes_: {} };
   Object.keys(attrs).forEach(attr => defineAttribute.bind(this)(attr, attrs[attr]));
   mountGettersSetters.bind(this.prototype)();
 }
 
 export default has;
 
-export { defineAttribute };
 export { requireValidation };
 export { typeValidation };
 export { executeDefault };
@@ -178,3 +175,5 @@ export { executeBuilder };
 export { executeTrigger };
 export { executeCoerce };
 export { hasOption };
+export { setAttribute };
+export { getAllOptions };

@@ -13,11 +13,11 @@ describe('Test HAS with { CLEARER } option', () => {
       expect(obj).to.have.property('_clearName');
     });
   });
-  it('must set the attribute to undefined', () => {
+  it('must set the attribute to undefined by removing it from the attributes', () => {
     const obj = createObjectWith('value', 'name', { is: 'rw', clearer: true });
     expect(obj).to.have.property('name').to.equal('value');
     obj.clearName();
-    expect(obj._attributes_).to.not.have.property('name');
+    expect(obj._jsmoo_._attributes_).to.not.have.property('name');
     expect(obj).to.have.property('name').to.equal(undefined);
   });
 });
