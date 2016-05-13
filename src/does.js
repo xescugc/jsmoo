@@ -20,8 +20,8 @@ function composeRole(role) {
   [{ base: this, role, isJsmoo }, { base: this.prototype, role: role.prototype }].forEach(proto => mergeAttributes(proto));
 }
 
-function withRoles(...roles) {
+function does(...roles) {
   roles.forEach(r => composeRole.bind(this, r)());
 }
 
-export default withRoles;
+export default does;

@@ -31,7 +31,7 @@ describe("Test 'has'", () => {
         const Role = buildRoleWith();
         Obj.has({ name: { is: 'rw', default: 'object' } });
         Role.has({ '+name': { default: 'role' } });
-        Obj.with(Role);
+        Obj.does(Role);
         const obj = new Obj();
         expect(obj).to.have.property('name').to.equal('role');
       });
@@ -41,7 +41,7 @@ describe("Test 'has'", () => {
         Obj.has({ name: { is: 'rw', default: 'object' } });
         Role.has({ '+pepe': { default: 'role' } });
         expect(() => {
-          Obj.with(Role);
+          Obj.does(Role);
         }).to.throw(TypeError, "Can't override an unexistent attribute 'pepe'");
       });
     });
@@ -50,7 +50,7 @@ describe("Test 'has'", () => {
         const Obj = buildObject();
         const Role = buildRoleWith();
         Role.has({ name: { is: 'rw', default: 'role' } });
-        Obj.with(Role);
+        Obj.does(Role);
         Obj.has({ '+name': { default: 'object' } });
         const obj = new Obj();
         expect(obj).to.have.property('name').to.equal('object');
@@ -59,7 +59,7 @@ describe("Test 'has'", () => {
         const Obj = buildObject();
         const Role = buildRoleWith();
         Role.has({ pepe: { is: 'rw', default: 'role' } });
-        Obj.with(Role);
+        Obj.does(Role);
         expect(() => {
           Obj.has({ '+name': { default: 'object' } });
         }).to.throw(TypeError, "Can't override an unexistent attribute 'name'");

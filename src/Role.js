@@ -1,5 +1,5 @@
 import has from './has';
-//import withRoles from './with';
+//import does from './does';
 
 class Role {
   constructor() {
@@ -8,6 +8,6 @@ class Role {
 }
 
 Role.has = has;
-//Role.with = withRoles;
+//Role.does = does;
 
 export default Role;

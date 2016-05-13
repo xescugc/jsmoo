@@ -1,5 +1,5 @@
 import has, { getAllOptions, setAttribute, hasOption, typeValidation, executeCoerce, executeTrigger, requireValidation, executeDefault, executeBuilder } from './has';
-import withRoles from './with';
+import does from './does';
 
 function initializeAttribute(attr, value) {
   let newValue = value;
@@ -35,6 +35,6 @@ class Jsmoo {
 }
 
 Jsmoo.has = has;
-Jsmoo.with = withRoles;
+Jsmoo.does = does;
 
 export default Jsmoo;

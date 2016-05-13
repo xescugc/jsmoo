@@ -29,12 +29,12 @@
       * [builder](#builder)
       * [trigger](#trigger)
       * [coerce](#coerce)
-    * [with](#with)
+    * [does](#does)
   * [Role](#role)
 
 # Jsmoo
 
-Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Classes and Roles with a simple API. It's inpired for the Perl library called [Moo][moo] and [Moose][moose]. It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`with` and `Role`) and much more.
+Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Classes and Roles with a simple API. It's inpired for the Perl library called [Moo][moo] and [Moose][moose]. It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`does` and `Role`) and much more.
 
 # Installation
 
@@ -359,7 +359,7 @@ __Example:__
 ```
 ### clearer
 
-Created a function (`clear${attributeName}` if it start with _ then `_clear${attributeName}`) to clear the value, which means setting it to `undefined`
+Created a function (`clear${attributeName}` if it start with _ then `_clear${attributeName}`) to clear the value, which means removing the attribute from the internal store.
 
 __Example:__
 
@@ -444,7 +444,7 @@ __Example:__
 
 ```
 
-## with
+## does
 
 It's the way to acomplish composition, there are some rules for Role composition:
 
@@ -483,7 +483,7 @@ __Example:__
 
   class Person extends Jsmoo {}
 
-  Person.with(AddressRole)
+  Person.does(AddressRole)
 
   Person.has({
     name:       { is: 'rw' },
@@ -506,7 +506,7 @@ __Example:__
 
 Roles are the way to achive composition, they are similar to the Jsmoo class but with some differences:
 
-  * They are the only ones that can be composed with `with`.
+  * They are the only ones that can be composed with `does`.
   * Roles can not be initialized.
 
 Roles also have the `has` static function to define attributes, wich then will be extended to the main Jsmoo Class.

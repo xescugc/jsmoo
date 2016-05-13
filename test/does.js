@@ -3,22 +3,22 @@ import { expect } from 'chai';
 import { buildObject, buildRoleWith } from './utils';
 import Jsmoo from '../src';
 
-describe("Role composition with 'WITH'", () => {
-  it("must have the function 'with'", () => {
-    expect(Jsmoo).to.have.property('with');
+describe("Role composition with 'DOES'", () => {
+  it("must have the function 'DOES'", () => {
+    expect(Jsmoo).to.have.property('does');
   });
   it("normal objects can't be composed", () => {
     const Obj = buildObject();
     const NoRole = buildObject();
     expect(() => {
-      Obj.with(NoRole);
+      Obj.does(NoRole);
     }).to.throw(TypeError, 'Only Roles can be composed');
   });
   it('only Roles can be composed', () => {
     const Obj = buildObject();
     const Role = buildRoleWith();
     expect(() => {
-      Obj.with(Role);
+      Obj.does(Role);
     }).not.to.throw(TypeError, 'Only Roles can be composed');
   });
   describe('must merge the ROLE to the Class', () => {
@@ -27,7 +27,7 @@ describe("Role composition with 'WITH'", () => {
         const Obj = buildObject();
         const Role = buildRoleWith();
         Role.prototype.testFunction = () => { return 'from role'; };
-        Obj.with(Role);
+        Obj.does(Role);
         const newObj = new Obj();
         expect(newObj).to.respondTo('testFunction');
         expect(newObj.testFunction()).to.equal('from role');
@@ -37,7 +37,7 @@ describe("Role composition with 'WITH'", () => {
         const Role = buildRoleWith();
         Role.prototype.testFunction = () => { return 'from role'; };
         Obj.prototype.testFunction = () => { return 'from object'; };
-        Obj.with(Role);
+        Obj.does(Role);
         const newObj = new Obj();
         expect(newObj).to.respondTo('testFunction');
         expect(newObj.testFunction()).to.equal('from object');
@@ -48,7 +48,7 @@ describe("Role composition with 'WITH'", () => {
         const Obj = buildObject();
         const Role = buildRoleWith();
         Role.testFunction = () => { return 'from role'; };
-        Obj.with(Role);
+        Obj.does(Role);
         expect(Obj).itself.to.respondTo('testFunction');
         expect(Obj.testFunction()).to.equal('from role');
       });
@@ -57,7 +57,7 @@ describe("Role composition with 'WITH'", () => {
         const Role = buildRoleWith();
         Role.testFunction = () => { return 'from role'; };
         Obj.testFunction = () => { return 'from object'; };
-        Obj.with(Role);
+        Obj.does(Role);
         expect(Obj).itself.to.respondTo('testFunction');
         expect(Obj.testFunction()).to.equal('from object');
       });
@@ -67,7 +67,7 @@ describe("Role composition with 'WITH'", () => {
         const Obj = buildObject();
         const Role = buildRoleWith();
         Role.has({ name: { is: 'rw', default: 'role' } });
-        Obj.with(Role);
+        Obj.does(Role);
         const obj = new Obj();
         expect(obj).to.have.property('name').to.equal('role');
       });
@@ -76,7 +76,7 @@ describe("Role composition with 'WITH'", () => {
         const Role = buildRoleWith();
         Obj.has({ name: { is: 'rw', default: 'object' } });
         Role.has({ name: { is: 'rw', default: 'role' } });
-        Obj.with(Role);
+        Obj.does(Role);
         const obj = new Obj();
         expect(obj).to.have.property('name').to.equal('object');
       });
