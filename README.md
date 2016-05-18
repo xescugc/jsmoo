@@ -30,6 +30,7 @@
       * [trigger](#trigger)
       * [coerce](#coerce)
     * [does](#does)
+    * [getAttributes](#getattributes)
   * [Role](#role)
 
 # Jsmoo
@@ -500,6 +501,31 @@ __Example:__
 
   person.address
   // => 'C/ Pepi To'
+```
+
+## getAttributes
+
+This function is present in all the Classes extending of Jsmoo as a instance function, it returns all the attributes setted of the Class:
+
+__Example;__
+
+``` js
+
+  class Client extends Jsmoo {}
+
+  Client.has({
+    name: { is: 'rw' },
+    age:  { is: 'rw', default: 18 },
+  });
+
+  const client = new Client({
+    name: 'Pepito'
+  });
+
+  console.log(client.getAttribute());
+
+  // => { name: 'Pepito', age:  18 }
+
 ```
 
 # Role

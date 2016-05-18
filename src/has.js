@@ -1,12 +1,16 @@
-function hasOption(attr, option) { return Object.keys(this._jsmoo_._has_[attr]).indexOf(option) >= 0; }
-function hasOptionsFor(attr) { return this._jsmoo_._has_[attr]; }
-function getOption(attr, option) { return this._jsmoo_._has_[attr][option]; }
-function setOption(attr, value) { this._jsmoo_._has_[attr] = value; }
-function getAllOptions() { return this._jsmoo_._has_; }
+function hasOption(attr, option) { return Object.keys(this._has_[attr]).indexOf(option) >= 0; }
+function hasOptionsFor(attr) { return this._has_[attr]; }
+function getOption(attr, option) { return this._has_[attr][option]; }
+function setOption(attr, value) { this._has_[attr] = value; }
+function getAllOptions() { return this._has_; }
 
-function getAttribute(attr) { return this._jsmoo_._attributes_[attr]; }
-function setAttribute(attr, value) { this._jsmoo_._attributes_[attr] = value; }
-function deleteAttribute(attr) { delete this._jsmoo_._attributes_[attr]; }
+//function getAttribute(attr) { return this._jsmoo_._attributes_[attr]; }
+//function setAttribute(attr, value) { this._jsmoo_._attributes_[attr] = value; }
+//function deleteAttribute(attr) { delete this._jsmoo_._attributes_[attr]; }
+function getAttribute(attr) { return this._attributes_[attr]; }
+function setAttribute(attr, value) { this._attributes_[attr] = value; }
+function deleteAttribute(attr) { delete this._attributes_[attr]; }
+function getAttributes() { return this._attributes_; }
 
 function defineFunctionNameFromAttribute(prefix, attr) {
   if (attr.match(/^_/)) {
@@ -106,7 +110,6 @@ function definePredicate(attr) {
   const predicateName = defineFunctionNameFromAttribute('has', attr);
   this[predicateName] = () => {
     const attributeValue = getAttribute.bind(this)(attr);
-    console.log(attributeValue);
     return (attributeValue !== undefined) && (attributeValue !== null);
   };
 }
@@ -125,8 +128,9 @@ function defineAttribute(attr, opts) {
   if (isOverride) newAttr = attr.replace(/^\+/, '');
 
   if (!isOverride && (!newOpts || !newOpts.is)) throw new TypeError("'is' key is required");
+
   if (isOverride && hasOptionsFor.bind(this.prototype)(newAttr)) {
-    // TODO: Remove the old property?
+    // TODO: Remove the old property? if something was created
     const beforeHas = hasOptionsFor.bind(this.prototype)(newAttr);
     newOpts = Object.assign({}, beforeHas, opts);
   }
@@ -161,9 +165,8 @@ function requireValidation() {
 }
 
 function has(attrs) {
-  if (!this.prototype._jsmoo_) this.prototype._jsmoo_ = { _has_: {}, _attributes_: {} };
+  if (!this.prototype._has_) this.prototype._has_ = { };
   Object.keys(attrs).forEach(attr => defineAttribute.bind(this)(attr, attrs[attr]));
-  mountGettersSetters.bind(this.prototype)();
 }
 
 export default has;
@@ -177,3 +180,6 @@ export { executeCoerce };
 export { hasOption };
 export { setAttribute };
 export { getAllOptions };
+export { mountGettersSetters };
+export { hasOptionsFor };
+export { getAttributes };

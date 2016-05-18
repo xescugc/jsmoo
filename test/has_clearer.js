@@ -17,7 +17,7 @@ describe('Test HAS with { CLEARER } option', () => {
     const obj = createObjectWith('value', 'name', { is: 'rw', clearer: true });
     expect(obj).to.have.property('name').to.equal('value');
     obj.clearName();
-    expect(obj._jsmoo_._attributes_).to.not.have.property('name');
+    expect(obj.getAttributes()).to.not.have.property('name');
     expect(obj).to.have.property('name').to.equal(undefined);
   });
 });

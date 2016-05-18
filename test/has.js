@@ -7,6 +7,10 @@ describe("Test 'has'", () => {
   it('must have fuction has', () => {
     expect(Jsmoo).to.have.property('has');
   });
+  it('must have function getAttributes', () => {
+    const obj = createObjectWith('test', 'name', { is: 'rw' });
+    expect(obj.getAttributes()).to.deep.equal({ name: 'test' });
+  });
   describe('with options', () => {
     it('beeing undefined', () => {
       expect(() => createObjectWith('test', 'name', undefined)).to.throw(TypeError);
@@ -66,7 +70,6 @@ describe("Test 'has'", () => {
       });
     });
   });
-  it('with { COERCE } option');
   it('with { READER } option');
   it('with { WRITTER } option');
 });
