@@ -45,4 +45,35 @@ describe("Test 'after'", () => {
     expect(afterParams).to.equal('test');
     expect(order).to.eql(['save-test', 'Pepito']);
   });
+  it('must continue to have the callbacks after the second initialization', () => {
+    const Obj = buildObject();
+    Obj.has({
+      name: { is: 'rw' },
+    });
+    let order = [];
+    Obj.prototype.save = function (name) {
+      order.push(`save-${name}`);
+    };
+    let afterParams;
+    after(Obj.prototype, 'save', function (param) {
+      afterParams = param;
+      order.push(this.name);
+    });
+
+    const obj = new Obj({ name: 'Pepito' });
+
+    obj.save('test');
+
+    expect(afterParams).to.equal('test');
+    expect(order).to.eql(['save-test', 'Pepito']);
+
+    order = [];
+
+    const obj2 = new Obj({ name: 'Pepito2' });
+
+    obj2.save('test');
+
+    expect(afterParams).to.equal('test');
+    expect(order).to.eql(['save-test', 'Pepito2']);
+  });
 });
