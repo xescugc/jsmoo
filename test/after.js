@@ -76,4 +76,5 @@ describe("Test 'after'", () => {
     expect(afterParams).to.equal('test');
     expect(order).to.eql(['save-test', 'Pepito2']);
   });
+  it('if the method does not exists');
 });

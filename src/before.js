@@ -19,7 +19,7 @@ function defineBeforeFunctions() {
     const oldFunction = this[override.method];
     this[override.method] = (...args) => {
       override.func.bind(this)(...args);
-      oldFunction.bind(this)(...args);
+      return oldFunction.bind(this)(...args);
     };
   });
 }
