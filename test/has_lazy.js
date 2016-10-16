@@ -2,8 +2,6 @@ import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import { createObjectWith, buildObject } from './utils';
 
-const _Promise = typeof Promise === 'undefined' ? require('es6-promise').Promise : Promise;
-
 describe('Test HAS with { LAZY } action', () => {
   describe('when the attribute is setted via initialization', () => {
     it('must have the initialization value on the _jsmoo_', () => {
@@ -54,7 +52,7 @@ describe('Test HAS with { LAZY } action', () => {
       let v = '2';
       Obj.has({ name: { is: 'rw', lazy: true, builder: true } });
       Obj.prototype.buildName = function () {
-        return new _Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           resolve(v);
         });
       };
@@ -73,7 +71,7 @@ describe('Test HAS with { LAZY } action', () => {
       let v = '2';
       Obj.has({ name: { is: 'rw', lazy: true, builder: true } });
       Obj.prototype.buildName = function () {
-        return new _Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
           reject(v);
         });
       };
