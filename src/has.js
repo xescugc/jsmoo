@@ -4,9 +4,6 @@ function getOption(attr, option) { return this._has_[attr][option]; }
 function setOption(attr, value) { this._has_[attr] = value; }
 function getAllOptions() { return this._has_; }
 
-//function getAttribute(attr) { return this._jsmoo_._attributes_[attr]; }
-//function setAttribute(attr, value) { this._jsmoo_._attributes_[attr] = value; }
-//function deleteAttribute(attr) { delete this._jsmoo_._attributes_[attr]; }
 function getAttribute(attr) { return this._attributes_[attr]; }
 function setAttribute(attr, value) { this._attributes_[attr] = value; }
 function deleteAttribute(attr) { delete this._attributes_[attr]; }
