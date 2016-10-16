@@ -90,11 +90,12 @@ function defineSetter(attr, value) {
 
 function defineGetter(attr) {
   let value = getAttribute.bind(this)(attr);
-  if (value === undefined && hasOption.bind(this)(attr, 'lazy') && hasOption.bind(this)(attr, 'default')) {
+  const isLazy = hasOption.bind(this)(attr, 'lazy');
+  if (value === undefined && isLazy && hasOption.bind(this)(attr, 'default')) {
     value = executeDefault.bind(this)(attr);
     value = executeCoerce.bind(this)(attr, value);
     setAttribute.bind(this)(attr, value);
-  } else if (value === undefined && hasOption.bind(this)(attr, 'lazy') && hasOption.bind(this)(attr, 'builder')) {
+  } else if (value === undefined && isLazy && hasOption.bind(this)(attr, 'builder')) {
     value = executeBuilder.bind(this)(attr);
     value = executeCoerce.bind(this)(attr, value);
     setAttribute.bind(this)(attr, value);

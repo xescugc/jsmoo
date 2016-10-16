@@ -46,4 +46,44 @@ describe('Test HAS with { LAZY } action', () => {
       expect(obj.getAttributes()).to.have.property('name').to.equal('2');
     });
   });
+  describe('when the attribute is a Promise', () => {
+    it('must return the first result without changing it (THEN)', () => {
+      const Obj = buildObject();
+      let v = '2';
+      Obj.has({ name: { is: 'rw', lazy: true, builder: true } });
+      Obj.prototype.buildName = function () {
+        return new Promise((resolve, reject) => {
+          resolve(v);
+        });
+      };
+      const obj = new Obj();
+      expect(obj).to.have.property('name');
+      obj.name.then(result => {
+        expect(result).to.equal('2');
+      });
+      v = '3';
+      obj.name.then(result => {
+        expect(result).to.equal('2');
+      });
+    });
+    it('must return the first result without changing it (CATCH)', () => {
+      const Obj = buildObject();
+      let v = '2';
+      Obj.has({ name: { is: 'rw', lazy: true, builder: true } });
+      Obj.prototype.buildName = function () {
+        return new Promise((resolve, reject) => {
+          reject(v);
+        });
+      };
+      const obj = new Obj();
+      expect(obj).to.have.property('name');
+      obj.name.catch(result => {
+        expect(result).to.equal('2');
+      });
+      v = '3';
+      obj.name.catch(result => {
+        expect(result).to.equal('2');
+      });
+    });
+  });
 });
