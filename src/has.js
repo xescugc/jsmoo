@@ -4,9 +4,6 @@ function getOption(attr, option) { return this._has_[attr][option]; }
 function setOption(attr, value) { this._has_[attr] = value; }
 function getAllOptions() { return this._has_; }
 
-//function getAttribute(attr) { return this._jsmoo_._attributes_[attr]; }
-//function setAttribute(attr, value) { this._jsmoo_._attributes_[attr] = value; }
-//function deleteAttribute(attr) { delete this._jsmoo_._attributes_[attr]; }
 function getAttribute(attr) { return this._attributes_[attr]; }
 function setAttribute(attr, value) { this._attributes_[attr] = value; }
 function deleteAttribute(attr) { delete this._attributes_[attr]; }
@@ -93,11 +90,12 @@ function defineSetter(attr, value) {
 
 function defineGetter(attr) {
   let value = getAttribute.bind(this)(attr);
-  if (value === undefined && hasOption.bind(this)(attr, 'lazy') && hasOption.bind(this)(attr, 'default')) {
+  const isLazy = hasOption.bind(this)(attr, 'lazy');
+  if (value === undefined && isLazy && hasOption.bind(this)(attr, 'default')) {
     value = executeDefault.bind(this)(attr);
     value = executeCoerce.bind(this)(attr, value);
     setAttribute.bind(this)(attr, value);
-  } else if (value === undefined && hasOption.bind(this)(attr, 'lazy') && hasOption.bind(this)(attr, 'builder')) {
+  } else if (value === undefined && isLazy && hasOption.bind(this)(attr, 'builder')) {
     value = executeBuilder.bind(this)(attr);
     value = executeCoerce.bind(this)(attr, value);
     setAttribute.bind(this)(attr, value);

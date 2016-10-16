@@ -1,6 +1,6 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import { createObjectWith } from './utils';
+import { createObjectWith, buildObject } from './utils';
 
 describe('Test HAS with { LAZY } action', () => {
   describe('when the attribute is setted via initialization', () => {
@@ -26,7 +26,64 @@ describe('Test HAS with { LAZY } action', () => {
     });
   });
   describe('when the attribute has a { BUILDER }', () => {
-    it('must not have any value on the _jsmoo_');
-    it('must change value on the _jsmoo_ when access');
+    it('must not have any value on the _jsmoo_', () => {
+      const Obj = buildObject();
+      Obj.has({ name: { is: 'rw', lazy: true, builder: true } });
+      Obj.prototype.buildName = function () {
+        return '2';
+      };
+      const obj = new Obj();
+      expect(obj.getAttributes().name).to.equal(undefined);
+    });
+    it('must change value on the _jsmoo_ when access', () => {
+      const Obj = buildObject();
+      Obj.has({ name: { is: 'rw', lazy: true, builder: true } });
+      Obj.prototype.buildName = function () {
+        return '2';
+      };
+      const obj = new Obj();
+      expect(obj).to.have.property('name').to.equal('2');
+      expect(obj.getAttributes()).to.have.property('name').to.equal('2');
+    });
+  });
+  describe('when the attribute is a Promise', () => {
+    it('must return the first result without changing it (THEN)', () => {
+      const Obj = buildObject();
+      let v = '2';
+      Obj.has({ name: { is: 'rw', lazy: true, builder: true } });
+      Obj.prototype.buildName = function () {
+        return new Promise((resolve, reject) => {
+          resolve(v);
+        });
+      };
+      const obj = new Obj();
+      expect(obj).to.have.property('name');
+      obj.name.then(result => {
+        expect(result).to.equal('2');
+      });
+      v = '3';
+      obj.name.then(result => {
+        expect(result).to.equal('2');
+      });
+    });
+    it('must return the first result without changing it (CATCH)', () => {
+      const Obj = buildObject();
+      let v = '2';
+      Obj.has({ name: { is: 'rw', lazy: true, builder: true } });
+      Obj.prototype.buildName = function () {
+        return new Promise((resolve, reject) => {
+          reject(v);
+        });
+      };
+      const obj = new Obj();
+      expect(obj).to.have.property('name');
+      obj.name.catch(result => {
+        expect(result).to.equal('2');
+      });
+      v = '3';
+      obj.name.catch(result => {
+        expect(result).to.equal('2');
+      });
+    });
   });
 });
