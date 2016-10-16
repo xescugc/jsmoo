@@ -338,6 +338,8 @@ __Example:__
   });
 ```
 
+This is useful in combination with [default](#default) or [builder](#builder) because you can use it to catch heaby operations like DB queryies.
+
 ### predicate
 
 Created a function (`has${attributeName}` if it start with _ then `_has${attributeName}`) to validate if the value is defined, wich means the values is not `undefined` or `null`
