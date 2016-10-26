@@ -35,7 +35,7 @@
 
 # Jsmoo
 
-Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Classes and Roles with a simple API. It's inpired for the Perl library called [Moo][moo] and [Moose][moose]. It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`does` and `Role`) and much more.
+Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Classes and Roles with a simple API. It's inpired for [Perl][perl] libraries [Moo][moo] and [Moose][moose], and also from [Perl6][perl6]. It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`does` and `Role`) and much more!.
 
 # Installation
 
@@ -85,6 +85,7 @@ With Jsmoo:
     }
   }
 
+  // Define the attributes and options
   Client.has({
     name:     { is: 'rw', isa: 'string', required: true },
     surname:  { is: 'rw', isa: 'string' },
@@ -110,14 +111,16 @@ The way the Classes are initialized is with a plain Object, where the keys are t
 
 ## beforeInitialize
 
-If you define this function on you class, will be called before the initialization arguments are passed to the constructor, here you can redefine this arguements as you want, the `return` from this function will be the ones the constructor will use.
+If you define this function on you class, will be called before the initialization arguments are passed to the constructor, here you can redefine this arguements as you want, the `return` from this function will be the ones the constructor will use to initialize the object.
 
 _Example:_
 
 ``` js
   class File extends from Jsmoo {
     beforeInitialize(args) {
-      args.extension = args.filename.split('.')[-1];
+      if (!args.extension) {
+        args.extension = args.filename.split('.')[-1];
+      }
       return args;
     }
   }
@@ -129,7 +132,7 @@ _Example:_
 
   const file = new File({filename: 'photo.jpg'});
   console.log(file.extension);
-  //  => '.jpg'
+  //  => 'jpg'
 ```
 
 ## afterInitialize
@@ -153,9 +156,13 @@ _Example:_
   //  => 'photo.jpg'
 ```
 
+You can use this function to register some callback or validation.
+
 ## before
 
-The `before` function is called before the specified function, the result of it is totally ignored, but you can throw an error to stop it if you need too.
+_API:_ before(rootObject, beforeThis, beforeFunction)
+
+The `before` function is called before the specified function. The result of it is totally ignored, but you can throw an error to stop the execution if you need too.
 
 ``` js
   import Jsmoo, { before } from 'jsmoo';
@@ -182,6 +189,8 @@ The `before` function is called before the specified function, the result of it 
 
   client.save();
 ```
+
+It's really useful to perform validations/callbacks, for example a _before save_ will do something before calling the save function.
 
 ## after
 
@@ -210,9 +219,11 @@ The `after` function is called after the specified function, the result of it is
   client.save();
 ```
 
+It's really useful to perform validations/callbacks, for example a _after create_ will do something after the function create is called.
+
 ## has
 
-Has provides the core functionallity of this module, define the attributes of the Class as easy as possible with a cler way. This method is a `static` method of the Class that has extended from `Jsmoo`.
+Has provides the core functionallity of this module, define the attributes of the Class as easy as possible as clear as possible. This method is a `static` method of the Class that has extended from `Jsmoo`.
 
 It expects a Object as parameters and each key of this object will become an attribute of the class. The configuration of the attribute is the value of the attribute key.
 
@@ -251,7 +262,7 @@ It defines the type of the attribute, it can have the following values:
   * Your types
   * Custom validations
 
-Each of this types is defined as string on the `isa` except for the 'Custom validations' which are functions that validates the type value, to declare a value as invalid you have to throw an error.
+Each of this types is defined as string on the `isa` except for the 'Custom validations' which are functions that validates the value. For custom validations each time a value es setted to the attribute it'll run this validations, the result of those is ignored, the only way to stop the execution is to throw an error.
 
 __Example:__
 
@@ -286,7 +297,7 @@ __Example:__
 
 ### default
 
-It defines a default value of an attribute if no one is given in the initialization, it can be a simple value or a function, the function has the `this` context of the Class but if you try to access some attribute that it's also default, you may, or may not, get the value you expect, if you want this behavior you shoud define the attributte you want to access as `lazy`.
+It defines a default value of an attribute _only_ if no one is given in the initialization, it can be a simple value or a function, the function has the `this` context of the Class but if you try to access some attribute that it's also default, you may, or may not, get the value you expect, if you want this behavior you shoud define the attributte you want to access as [lazy](#lazy).
 
 __Example:__
 
@@ -383,7 +394,7 @@ __Example:__
 
 ### builder
 
-Created a defines a function to build the attribute if not initialized, if it has a Boolean value it will call the function `build${attributeName}` (if it start with _ then `_build${attributeName}`) but you can override this by passing a string with the name of the builder function that you want, this function would have the `this` context of the class.
+Defines a function to build the attribute if not initialized, if it has a Boolean value it will call the function `build${attributeName}` (if it start with _ then `_build${attributeName}`) but you can override this by passing a string with the name of the builder function that you want, this function would have the `this` context of the class.
 
 __Example:__
 
@@ -400,9 +411,12 @@ __Example:__
 
 ```
 
+This is very useful to use it with Role compositions and the role defined the builder and then the Ojbect with the Role has to define the custom implementation.
+
 ### trigger
 
-It creates a handle that will trigger after the attribute is setted. This includes the constructor but not `default` ond `builder`. This handle will recieve the `oldValue` and the `newValue`. It can be defined with a boolean value, in which case would call a function with the name of the attribute like this `trigger${attributeName}` (if is starts with _ then `_trigger${attributeName}`. Or it can be defined with a funciton.
+_API:_ function(newValue, oldValue) {}
+It creates a handle that will trigger after the attribute is setted. This includes the constructor but not [`default`](#default) ond [`builder`](#builder). This handle will recieve the `oldValue` and the `newValue`. It can be defined with a boolean value, in which case would call a function with the name of the attribute like this `trigger${attributeName}` (if is starts with _ then `_trigger${attributeName}`. Or it can be defined with a funciton.
 
 __Example:__
 
@@ -419,9 +433,13 @@ __Example:__
   function triggerForAge (newValue, oldValue) { }
 ```
 
+Very useful to register some kind of callbacks to some attributes after they change.
+
 ### coerce
 
-It takes a function and coerce the attribute
+_API:_ function(value) {}
+
+It takes a function and coerce the attribute. Which means it may transform the value to another one.
 
 __Example:__
 
@@ -447,6 +465,8 @@ __Example:__
 
 ```
 
+It's usefull to transform no objects to objects, or different types (string => integer)
+
 ## does
 
 It's the way to acomplish composition, there are some rules for Role composition:
@@ -454,10 +474,10 @@ It's the way to acomplish composition, there are some rules for Role composition
   * Only `Roles` can be composed.
   * Roles can `override` existing attributes with the `+` sign.
   * Classes can `override` existing attributes with the sign `+` sign.
-  * If one of the _overrided_ attributes is not declated (with has) before the declaration of the _override_ it will fail loudly.
-  * If a function is defined in the main Class, the Role will not override it.
+  * If one of the _overrided_ attributes is not declated (with has) before the declaration of the _override_ it will fail loudly, basically if you try to `+name` and `name` is not defiend by the Role then it fails..
+  * If a function is defined in the main Class, the Role will not _override_ it.
 
-The instance and class functions will be composed to the main Class and also the attributes defined with `has`.
+The instance and class functions will be composed to the main Class and also the attributes defined with [`has`](#has) on the Role.
 
 __Example:__
 
@@ -507,7 +527,7 @@ __Example:__
 
 ## getAttributes
 
-This function is present in all the Classes extending of Jsmoo as a instance function, it returns all the attributes setted of the Class:
+This function is present in all the Classes extending of Jsmoo as a instance function, it returns all the attributes setted with [`has`](#has) of the Class:
 
 __Example;__
 
@@ -537,9 +557,34 @@ Roles are the way to achive composition, they are similar to the Jsmoo class but
   * They are the only ones that can be composed with `does`.
   * Roles can not be initialized.
 
-Roles also have the `has` static function to define attributes, wich then will be extended to the main Jsmoo Class.
+Roles also have the [`has`](#has) static function to define attributes, wich then will be extended to the main Jsmoo Class.
+
+They work the same way of a Jsmoo Class.
+
+``` js
+import Jsmoo, { Role } from 'jsmoo'
+
+class Document extends Role {}
+
+Document.has({
+  _id: { is: 'rw', isa: 'number' }
+})
+
+class Person extends Jsmoo {}
+
+Person.with(Document)
+
+const person = new Person({ _id: 23 })
+
+console.log(person._id)
+// => 23
+```
+
+The use of Role is up to you hehe, basically is to abstract some code that is used in other classes, like the logic to query or serialize to a DB (like a ORM)
 
 [moo]: https://metacpan.org/pod/Moo
 [moose]: https://metacpan.org/pod/Moose
 [travis-image]: https://travis-ci.org/XescuGC/jsmoo.svg?branch=master
 [travis-url]: https://travis-ci.org/XescuGC/jsmoo
+[perl]: https://www.perl.org/
+[perl6]: https://perl6.org/
