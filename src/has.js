@@ -1,14 +1,46 @@
+/**
+This file defines all the methods used on the internal HAS, includig the structure in which the values are saved
+this structure is the following:
+
+  {
+    _has_: {} // All the internal options defined on the object
+    _attributes_: {} // All setted values
+  }
+
+This are attributes defined on the Class
+**/
+
+// The following methods are getters and setter for the JSMOO internal structure
+
+// Check if the ATTR has the given OPTION the HAS
 function hasOption(attr, option) { return Object.keys(this._has_[attr]).indexOf(option) >= 0; }
+
+// Check if the ATTR has any HAS
 function hasOptionsFor(attr) { return this._has_[attr]; }
+
+// Returns the value of the ATTR OPTION on the HAS
 function getOption(attr, option) { return this._has_[attr][option]; }
+
+// Sets the ATTR HAS with the VALUE
 function setOption(attr, value) { this._has_[attr] = value; }
+
+// Returns all the HAS
 function getAllOptions() { return this._has_; }
 
+// Returns the value of the ATTR
 function getAttribute(attr) { return this._attributes_[attr]; }
+
+// Sets the VALUE of the ATTR
 function setAttribute(attr, value) { this._attributes_[attr] = value; }
+
+// Deletes the ATTR from the _attributes_
 function deleteAttribute(attr) { delete this._attributes_[attr]; }
+
+// Returns all attributes
 function getAttributes() { return this._attributes_; }
 
+
+// Helper to define default function names from: predicate, trigger, default and builder options
 function defineFunctionNameFromAttribute(prefix, attr) {
   if (attr.match(/^_/)) {
     return `_${prefix}${attr[1].toUpperCase()}${attr.substring(2)}`;
@@ -16,6 +48,8 @@ function defineFunctionNameFromAttribute(prefix, attr) {
   return `${prefix}${attr[0].toUpperCase()}${attr.substring(1)}`;
 }
 
+// Function executed when the ATTR has ISA in his options.
+// Internally it uses the typeof and constructor.name to validate the type (Array.isArray() in case of Arrays)
 function typeValidation(attr, value) {
   if (!hasOption.bind(this)(attr, 'isa')) return true;
   let isMaybe = false;
@@ -36,6 +70,7 @@ function typeValidation(attr, value) {
   return true;
 }
 
+// Function executed when the ATTR has COERCE in his options, only functions are accepted in the COERCE
 function executeCoerce(attr, value) {
   if (!hasOption.bind(this)(attr, 'coerce')) return value;
   const coerceValue = getOption.bind(this)(attr, 'coerce');
@@ -44,6 +79,7 @@ function executeCoerce(attr, value) {
   return coerceValue(value);
 }
 
+// Function executed when the DEFAULT is needed
 function executeDefault(attr) {
   const defaultValue = getOption.bind(this)(attr, 'default');
   let value = typeof defaultValue === 'function' ? defaultValue.bind(this)() : defaultValue;
@@ -52,6 +88,7 @@ function executeDefault(attr) {
   return value;
 }
 
+// Function executed when the BUILDER is needed
 function executeBuilder(attr) {
   const defaultValue = getOption.bind(this)(attr, 'builder');
   let value;
@@ -68,6 +105,7 @@ function executeBuilder(attr) {
   return value;
 }
 
+// Function executed when the TRIGGER is defined onthe ATTR
 function executeTrigger(attr, newValue, oldValue) {
   if (!hasOption.bind(this)(attr, 'trigger')) return true;
   const triggerValue = getOption.bind(this)(attr, 'trigger');
@@ -79,6 +117,7 @@ function executeTrigger(attr, newValue, oldValue) {
   }
 }
 
+// Function executed when definig the setters at the new of the Jsmoo class, it follows this order: coerce, isa, is and trigger
 function defineSetter(attr, value) {
   let newValue = value;
   newValue = executeCoerce.bind(this)(attr, newValue);
@@ -88,6 +127,7 @@ function defineSetter(attr, value) {
   setAttribute.bind(this)(attr, newValue);
 }
 
+// Funciton executed when definig the getters of a new Jsmoo class, it follows this order: default/builder and coerce
 function defineGetter(attr) {
   let value = getAttribute.bind(this)(attr);
   const isLazy = hasOption.bind(this)(attr, 'lazy');
@@ -103,6 +143,7 @@ function defineGetter(attr) {
   return value;
 }
 
+// Function executed when the PREDICATE is defined on the ATTR
 function definePredicate(attr) {
   if (!hasOption.bind(this)(attr, 'predicate')) return;
   const predicateName = defineFunctionNameFromAttribute('has', attr);
@@ -112,12 +153,14 @@ function definePredicate(attr) {
   };
 }
 
+// Function executed when the CLEARER is defined on the ATTR
 function defineClearer(attr) {
   if (!hasOption.bind(this)(attr, 'clearer')) return;
   const clearerName = defineFunctionNameFromAttribute('clear', attr);
   this[clearerName] = deleteAttribute.bind(this, attr);
 }
 
+// It defines all the HAS OPTS of the ATTR, validating the IS and checking the + sign to override
 function defineAttribute(attr, opts) {
   if (hasOptionsFor.bind(this.prototype)(attr)) return;
   let newAttr = attr;
@@ -140,6 +183,7 @@ function defineAttribute(attr, opts) {
   setOption.bind(this.prototype)(newAttr, newOpts);
 }
 
+// It mounts all the HAS options for each attribute defined, defining properties with get and set
 function mountGettersSetters() {
   Object.keys(getAllOptions.bind(this)()).forEach(attr => {
     definePredicate.bind(this)(attr);
@@ -154,6 +198,7 @@ function mountGettersSetters() {
   });
 }
 
+// Functions executed to validate that all the required attributes are setted
 function requireValidation() {
   Object.keys(getAllOptions.bind(this)()).forEach(attr => {
     if (getOption.bind(this)(attr, 'required') && (getAttribute.bind(this)(attr) === undefined || getAttribute.bind(this)(attr) === null)) {
@@ -162,6 +207,7 @@ function requireValidation() {
   });
 }
 
+// Funciton exported to the global JSMOO class to have access to the HAS
 function has(attrs) {
   if (!this.prototype._has_) this.prototype._has_ = { };
   Object.keys(attrs).forEach(attr => defineAttribute.bind(this)(attr, attrs[attr]));

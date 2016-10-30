@@ -1,3 +1,5 @@
+// Merges all the attributes from the role to the base (which can be a Role or a Jsmoo class)
+// it does not coppy functions defined on the Role and in the Base in favor of the Base and also the internal functions
 function mergeAttributes({ base, role, isJsmoo }) {
   //TODO: See if some one has another work arround for Symbols
   //Object.getOwnPropertyNames(role).concat(Object.getOwnPropertySymbols(role)).forEach((prop) => {
@@ -13,6 +15,7 @@ function mergeAttributes({ base, role, isJsmoo }) {
   }
 }
 
+// Validates that the Role is infact a Role and if the THIS object is a Jsmoo class
 function composeRole(role) {
   if (Object.getPrototypeOf(role).name !== 'Role') throw new TypeError('Only Roles can be composed');
 
@@ -20,6 +23,7 @@ function composeRole(role) {
   [{ base: this, role, isJsmoo }, { base: this.prototype, role: role.prototype }].forEach(proto => mergeAttributes(proto));
 }
 
+// The function exported to Jsmoo.js habilitate the Role composition
 function does(...roles) {
   roles.forEach(r => composeRole.bind(this, r)());
 }

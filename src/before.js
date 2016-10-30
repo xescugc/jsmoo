@@ -1,3 +1,8 @@
+// The before function importe to the global import of JSMOO
+//
+// object = The Ojbet on which the before funcition will search for the method to attach
+// method = A string with the name of the method to attach
+// func   = The function which will be called before the method
 function before(object, method, func) {
   if (object.prototype) {
     //TODO: FOR STATIC METHODS
@@ -12,6 +17,7 @@ function before(object, method, func) {
   }
 }
 
+// Function exported to the Jsmoo.js to attach the before functions to the new object
 function defineBeforeFunctions() {
   if (!this._beforeFunctions_) return;
 
