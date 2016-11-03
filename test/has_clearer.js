@@ -20,4 +20,12 @@ describe('Test HAS with { CLEARER } option', () => {
     expect(obj.getAttributes()).to.not.have.property('name');
     expect(obj).to.have.property('name').to.equal(undefined);
   });
+  it('must attribute but still usable with defaults', () => {
+    const defFunc = function () { return 'pepita'; };
+    const obj = createObjectWith('value', 'name', { is: 'ro', lazy: true, clearer: true, default: defFunc });
+    expect(obj).to.have.property('name').to.equal('value');
+    obj.clearName();
+    expect(obj.getAttributes()).to.not.have.property('name');
+    expect(obj).to.have.property('name').to.equal('pepita');
+  });
 });
