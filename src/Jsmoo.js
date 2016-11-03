@@ -1,5 +1,5 @@
 // This is he main fail where teh  construction of the JSMOO objects happends
-import has, { getAttributes, hasOptionsFor, mountGettersSetters, getAllOptions, setAttribute, hasOption, typeValidation, executeCoerce, executeTrigger, requireValidation, executeDefault, executeBuilder } from './has';
+import has, { getAttributes, hasOptionsFor, mountGettersSetters, getAllOptions, setAttribute, hasOption, typeValidation, executeCoerce, executeTrigger, requireValidation, executeDefault, executeBuilder, getAttribute } from './has';
 import does from './does';
 import { defineAfterFunctions } from './after';
 import { defineBeforeFunctions } from './before';
@@ -40,7 +40,7 @@ class Jsmoo {
     initializedAttr.forEach(attr => initializeAttribute.bind(this)(attr, newAttrs[attr]));
     requireValidation.bind(this)();
     hasAttr.filter(attr => initializedAttr.indexOf(attr) < 0).forEach(attr => {
-      let value;
+      let value = getAttribute.bind(this)(attr);
       if (hasOption.bind(this)(attr, 'default') && !hasOption.bind(this)(attr, 'lazy')) {
         value = executeDefault.bind(this)(attr);
       } else if (hasOption.bind(this)(attr, 'builder') && !hasOption.bind(this)(attr, 'lazy')) {

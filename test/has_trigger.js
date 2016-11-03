@@ -31,6 +31,24 @@ describe('Test HAS with { TRIGGER } option', () => {
         expect(expectedNew).to.equal('name');
         expect(expectedOld).to.equal(undefined);
       });
+      it('changing other attributes', () => {
+        const Obj = buildObject();
+        let expectedNew;
+        let expectedOld;
+        Obj.prototype.triggerName = function (newValue, oldValue) {
+          expectedOld = oldValue;
+          expectedNew = newValue;
+          this.n = true;
+        };
+        Obj.has({
+          name: { is: 'rw', trigger: 1 },
+          n:    { is: 'rw' },
+        });
+        const obj = new Obj({ name: 'name' });
+        expect(expectedNew).to.equal('name');
+        expect(expectedOld).to.equal(undefined);
+        expect(obj.n).to.equal(true);
+      });
     });
     it('as a function value', () => {
       const Obj = buildObject();

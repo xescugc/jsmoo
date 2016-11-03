@@ -416,6 +416,7 @@ This is very useful to use it with Role compositions and the role defined the bu
 ### trigger
 
 _API:_ function(newValue, oldValue) {}
+
 It creates a handle that will trigger after the attribute is setted. This includes the constructor but not [`default`](#default) ond [`builder`](#builder). This handle will recieve the `oldValue` and the `newValue`. It can be defined with a boolean value, in which case would call a function with the name of the attribute like this `trigger${attributeName}` (if is starts with _ then `_trigger${attributeName}`. Or it can be defined with a funciton.
 
 __Example:__

@@ -227,3 +227,4 @@ export { getAllOptions };
 export { mountGettersSetters };
 export { hasOptionsFor };
 export { getAttributes };
+export { getAttribute };
