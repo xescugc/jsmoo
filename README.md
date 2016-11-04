@@ -37,6 +37,8 @@
 
 Jsmoo (JavaScript Minimalist Object Orientation), it's a library that allows you to define consistent Classes and Roles with a simple API. It's inpired for [Perl][perl] libraries [Moo][moo] and [Moose][moose], and also from [Perl6][perl6]. It provides type validation for attributes (`isa`), presence validation (`required`), defaults (`default`), role composition (`does` and `Role`) and much more!.
 
+If you want some slaides of a presentation about this lib, here you have the [link](slides)
+
 # Installation
 
 With npm:
@@ -589,3 +591,4 @@ The use of Role is up to you hehe, basically is to abstract some code that is us
 [travis-url]: https://travis-ci.org/XescuGC/jsmoo
 [perl]: https://www.perl.org/
 [perl6]: https://perl6.org/
+[slides]: https://github.com/XescuGC/jsmoo_presentation
