@@ -1,6 +1,6 @@
 {
   "name": "jsmoo",
-  "version": "0.18.2",
+  "version": "0.18.3",
   "description": "JavaScript Minimalist Object Orientation",
   "main": "lib/index.js",
   "scripts": {
